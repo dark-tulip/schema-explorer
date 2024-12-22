@@ -1,0 +1,43 @@
+plugins {
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'java'
+}
+
+group = 'ru.anvera'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    // spring & kafka deps
+    implementation 'org.springframework.boot:spring-boot-starter:3.3.5'
+    implementation 'org.springframework:spring-core:6.2.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+
+    // core
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+
+    // annnotation processing
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'ru.anvera.Main'
+        )
+    }
+}
