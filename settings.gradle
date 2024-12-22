@@ -1,1 +1,8 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal() // For Spring Boot plugin
+        mavenCentral()       // For dependencies
+    }
+}
+
 rootProject.name = 'schema-explorer'

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TableResponse {
-  private String               table;
-  private List<ColumnResponse> columns;
+public class TableMetadataInfoResponse {
+  private String                       table;
+  private List<ColumnMetadataResponse> columns;
 }

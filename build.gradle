@@ -1,43 +1,42 @@
 plugins {
     id 'org.springframework.boot' version '3.1.4'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'io.spring.dependency-management' version '1.1.3' // Ensure dependency management
     id 'java'
 }
 
 group = 'ru.anvera'
 version = '1.0-SNAPSHOT'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 repositories {
     mavenCentral()
-    gradlePluginPortal()
 }
 
 dependencies {
-    // spring & kafka deps
-    implementation 'org.springframework.boot:spring-boot-starter:3.3.5'
-    implementation 'org.springframework:spring-core:6.2.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
+    // PostgreSQL JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Jackson for JSON processing
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-    // core
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    // Lombok for annotation processing
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    // annnotation processing
-    compileOnly 'org.projectlombok:lombok:1.18.28'
-    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    // Testing dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'ru.anvera.Main'
-        )
-    }
 }

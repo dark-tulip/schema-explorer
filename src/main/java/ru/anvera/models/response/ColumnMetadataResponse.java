@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColumnResponse {
+public class ColumnMetadataResponse {
   private String name;
   private String type;
-  private String constraints;
+  private String isNullable;
 }

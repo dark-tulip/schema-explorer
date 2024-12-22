@@ -5,12 +5,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.anvera.factory.JdbcTemplateFactory;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
-import ru.anvera.models.response.ColumnResponse;
+import ru.anvera.models.response.ColumnMetadataResponse;
 import ru.anvera.models.response.SchemaMetadataInfoResponse;
-import ru.anvera.models.response.TableResponse;
 import ru.anvera.repos.DatabaseMetadataRepository;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,10 +20,7 @@ public class SchemaMetadataService {
 
   private final JdbcTemplateFactory jdbcTemplateFactory;
 
-  public List<SchemaMetadataInfoResponse> getInfo(SchemaMetadataInfoRequest request) {
-    List<SchemaMetadataInfoResponse> response = new ArrayList<>();
-
-
+  public SchemaMetadataInfoResponse getInfo(SchemaMetadataInfoRequest request) {
     // create new template
     JdbcTemplate jdbcTemplate = jdbcTemplateFactory
         .createJdbcTemplate(request.getDbType(),
@@ -36,29 +32,27 @@ public class SchemaMetadataService {
     // create new repo for this data source
     DatabaseMetadataRepository databaseMetadataRepository = new DatabaseMetadataRepository(jdbcTemplate);
 
-    List<String> schemaNames = databaseMetadataRepository.getSchemas();
+    HashMap<String, HashMap<String, List<ColumnMetadataResponse>>> schemaNameAndTables = new HashMap<>();
 
-    for (String schemaName : schemaNames) {
-      List<TableResponse> tablesResponse = new ArrayList<>();
+    for (String schemaName : databaseMetadataRepository.getSchemas()) {
+      HashMap<String, List<ColumnMetadataResponse>> tables = new HashMap<>();
 
-      List<String> tableNames = databaseMetadataRepository.getTableNames(schemaName);
-
-      for (String tableName : tableNames) {
-        List<ColumnResponse> columnsResponse = databaseMetadataRepository
+      for (String tableName : databaseMetadataRepository.getTableNames(schemaName)) {
+        List<ColumnMetadataResponse> columnsResponse = databaseMetadataRepository
             .getColumnMetadataBySchemaNameAndTableName(schemaName, tableName)
             .stream()
-            .map(column -> new ColumnResponse(
+            .map(column -> new ColumnMetadataResponse(
                 (String) column.get("column_name"),
                 (String) column.get("data_type"),
                 (String) column.get("is_nullable")
             ))
             .collect(Collectors.toList());
 
-        tablesResponse.add(new TableResponse(tableName, columnsResponse));
+        tables.put(tableName, columnsResponse);
       }
-      response.add(new SchemaMetadataInfoResponse(schemaName, tablesResponse));
 
+      schemaNameAndTables.put(schemaName, tables);
     }
-    return response;
+    return new SchemaMetadataInfoResponse(schemaNameAndTables);
   }
 }
