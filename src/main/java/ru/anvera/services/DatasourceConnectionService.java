@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 public class DatasourceConnectionService {
 
   private final DatasourceConnectionRepository datasourceConnectionRepository;
-  private final DatasourceMetadataService datasourceMetadataService;
-  private final TableMappingRepository    tableMappingRepository;
+  private final DatasourceMetadataService      datasourceMetadataService;
+  private final TableMappingRepository         tableMappingRepository;
 
   public List<DatasourceConnection> getAllConnections() {
     return datasourceConnectionRepository.findAll();
@@ -37,8 +37,19 @@ public class DatasourceConnectionService {
     return datasourceConnectionRepository.getById(id);
   }
 
-  public Long add(DatasourceConnectionAddRequest request) {
-    return datasourceConnectionRepository.save(new DatasourceConnection(
+  public DatasourceConnection add(DatasourceConnectionAddRequest request) {
+    // check connection creds
+    datasourceMetadataService.connectAndGetMetadataInfo(
+        new SchemaMetadataInfoRequest(
+            request.getDbType(),
+            request.getUrl(),
+            request.getUsername(),
+            request.getPassword()
+        )
+    );
+
+    // check connection creds
+    Long id = datasourceConnectionRepository.save(new DatasourceConnection(
         null,
         request.getDbType(),
         request.getUrl(),
@@ -47,6 +58,8 @@ public class DatasourceConnectionService {
         request.getIsActive(),
         request.getDatasourceType()
     ));
+
+    return datasourceConnectionRepository.getById(id);
   }
 
   public void updateConnection(DatasourceConnection connection) {
@@ -109,10 +122,10 @@ public class DatasourceConnectionService {
   }
 
   private void validateSchemaMetadataForExistence(Long datasourceConnectionId,
-                                                 String schemaName,
-                                                 String tableName,
-                                                 List<String> requestColumnNamesForMapping,
-                                                 DataSource dataSourceType) {
+                                                  String schemaName,
+                                                  String tableName,
+                                                  List<String> requestColumnNamesForMapping,
+                                                  DataSource dataSourceType) {
     DatasourceConnection dbConnection = datasourceConnectionRepository.getById(datasourceConnectionId);
     DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService.connectAndGetMetadataInfo(new SchemaMetadataInfoRequest(
         dbConnection.getDbType(),

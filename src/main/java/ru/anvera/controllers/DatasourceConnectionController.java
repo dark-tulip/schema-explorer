@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
@@ -19,7 +20,7 @@ public class DatasourceConnectionController {
   private final DatasourceConnectionService datasourceConnectionService;
 
   @PostMapping("/add")
-  public Long addPost(@RequestBody DatasourceConnectionAddRequest request) {
+  public DatasourceConnection addPost(@RequestBody DatasourceConnectionAddRequest request) {
     return datasourceConnectionService.add(request);
   }
 
@@ -27,6 +28,5 @@ public class DatasourceConnectionController {
   public TableMapping validateSchemaMapping(@RequestBody DatasourceConnectionValidateSchemaMappingRequest request) {
     return datasourceConnectionService.validateSchemaMapping(request);
   }
-
 
 }
