@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
-import ru.anvera.services.SchemaMetadataService;
+import ru.anvera.services.DatasourceMetadataService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +18,11 @@ import java.util.List;
 @RestController("/schema/metadata")
 public class SchemaMetadataController {
 
-  private final SchemaMetadataService schemaMetadataService;
+  private final DatasourceMetadataService datasourceMetadataService;
 
   @PostMapping("/info")
   public HashMap<String, HashMap<String, List<ColumnMetadataResponse>>> getInfo(@Validated @RequestBody SchemaMetadataInfoRequest request) {
-    return schemaMetadataService.getInfo(request).getSchemaNameAndTables();
+    return datasourceMetadataService.connectAndGetMetadataInfo(request).getSchemaNameAndTables();
   }
 
 }

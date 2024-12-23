@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.anvera.factory.JdbcTemplateFactory;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
-import ru.anvera.models.response.SchemaMetadataInfoResponse;
+import ru.anvera.models.response.DatasourceMetadataInfoResponse;
 import ru.anvera.repos.PostgresDatabaseMetadataRepository;
 
 import java.util.HashMap;
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class SchemaMetadataService {
+public class DatasourceMetadataService {
 
   private final JdbcTemplateFactory jdbcTemplateFactory;
 
-  public SchemaMetadataInfoResponse getInfo(SchemaMetadataInfoRequest request) {
+  public DatasourceMetadataInfoResponse connectAndGetMetadataInfo(SchemaMetadataInfoRequest request) {
     // create new template
     JdbcTemplate jdbcTemplate = jdbcTemplateFactory
         .createJdbcTemplate(request.getDbType(),
@@ -54,6 +54,6 @@ public class SchemaMetadataService {
       schemaNameAndTables.put(schemaName, tables);
     }
 
-    return new SchemaMetadataInfoResponse(schemaNameAndTables);
+    return new DatasourceMetadataInfoResponse(schemaNameAndTables);
   }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -26,6 +27,6 @@ public class DatasourceConnectionValidateSchemaMappingRequest {
   private List<String> sourceColumnsList;
   private List<String> sinkColumnsList;
 
-  // todo optional field to create new schema and tables
-  private boolean createNewSchema = true;
+  private Map<String, String> transformations;
+
 }

@@ -21,4 +21,19 @@
         </sql>
     </changeSet>
 
+    <changeSet id="2-create-datasource-connections-table" author="ttelbayvea">
+        <sql>
+            CREATE TABLE table_mapping
+            (
+                id                            BIGSERIAL PRIMARY KEY,
+                source_schema_name            text  NOT NULL,
+                sink_schema_name              text  NOT NULL,
+                source_table                  text  NOT NULL,
+                sink_table                    text  NOT NULL,
+                source_to_sink_column_mapping JSONB NOT NULL,
+                transformations               JSONB
+            );
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

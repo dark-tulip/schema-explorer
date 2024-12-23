@@ -4,16 +4,20 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.anvera.models.DataSource;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
-import ru.anvera.models.response.SchemaMetadataInfoResponse;
+import ru.anvera.models.response.DatasourceMetadataInfoResponse;
 import ru.anvera.repos.DatasourceConnectionRepository;
+import ru.anvera.repos.TableMappingRepository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -21,9 +25,8 @@ import java.util.List;
 public class DatasourceConnectionService {
 
   private final DatasourceConnectionRepository datasourceConnectionRepository;
-  private final SchemaMetadataService          schemaMetadataService;
-
-
+  private final DatasourceMetadataService datasourceMetadataService;
+  private final TableMappingRepository    tableMappingRepository;
 
   public List<DatasourceConnection> getAllConnections() {
     return datasourceConnectionRepository.findAll();
@@ -53,68 +56,78 @@ public class DatasourceConnectionService {
     datasourceConnectionRepository.deleteById(id);
   }
 
+  /**
+   * есть source datasource
+   * есть еще sink datasource
+   * из source мы выбираем схему и таблицу (и выборочно названия столбцов которые хотим перенести) в sink datasource,
+   */
   public void validateSchemaMapping(DatasourceConnectionValidateSchemaMappingRequest request) {
     // ****** source metadata ******
-    DatasourceConnection source = datasourceConnectionRepository.getById(request.getSourceDatasourceConnectionId());
-    SchemaMetadataInfoResponse sourceMetadataInfoResponse = schemaMetadataService.getInfo(new SchemaMetadataInfoRequest(
-        source.getDbType(),
-        source.getUrl(),
-        source.getUsername(),
-        source.getPassword()
+    validateSchemaMetadataForExistence(
+        request.getSourceDatasourceConnectionId(),
+        request.getSourceSchemaName(),
+        request.getSourceTableName(),
+        request.getSourceColumnsList(),
+        DataSource.SOURCE
+    );
+
+    // ****** sink metadata ******
+    validateSchemaMetadataForExistence(
+        request.getSinkDatasourceConnectionId(),
+        request.getSinkSchemaName(),
+        request.getSinkTableName(),
+        request.getSinkColumnsList(),
+        DataSource.SINK
+    );
+
+    if (request.getSinkColumnsList().size() == request.getSourceColumnsList().size()) {
+      throw new RuntimeException("Колво столбцов для маппинга source и sink таблицы должны быть равны");
+    }
+
+
+//    tableMappingRepository.insert(
+//        new TableMapping(
+//
+//        )
+//    )
+
+
+  }
+
+  private void validateSchemaMetadataForExistence(Long datasourceConnectionId,
+                                                 String schemaName,
+                                                 String tableName,
+                                                 List<String> requestColumnNamesForMapping,
+                                                 DataSource dataSourceType) {
+    DatasourceConnection dbConnection = datasourceConnectionRepository.getById(datasourceConnectionId);
+    DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService.connectAndGetMetadataInfo(new SchemaMetadataInfoRequest(
+        dbConnection.getDbType(),
+        dbConnection.getUrl(),
+        dbConnection.getUsername(),
+        dbConnection.getPassword()
     ));
 
     // схемы
-    HashMap<String, List<ColumnMetadataResponse>> sourceSchemaMetadata = sourceMetadataInfoResponse.getSchemaNameAndTables().get(request.getSourceSchemaName());
+    HashMap<String, List<ColumnMetadataResponse>> sourceSchemaMetadata = dbMetadataInfoResponse.getSchemaNameAndTables().get(schemaName);
     if (sourceSchemaMetadata == null) {
-      throw new RuntimeException("Нет такой схемы в источнике: " + request.getSourceSchemaName());
+      throw new RuntimeException("Нет такой схемы в " + schemaName + " БД " + dataSourceType);
     }
 
     // таблицы
-    List<ColumnMetadataResponse> sourceTableColumns = sourceSchemaMetadata.get(request.getSourceTableName());
+    List<ColumnMetadataResponse> sourceTableColumns = sourceSchemaMetadata.get(tableName);
     if (sourceTableColumns == null) {
-      throw new RuntimeException("Нет такой таблицы в источнике: " + request.getSourceSchemaName());
+      throw new RuntimeException("Нет такой таблицы в " + dataSourceType + " БД и схеме " + schemaName);
     }
 
-    // ****** sink metadata ******
-    DatasourceConnection sink = datasourceConnectionRepository.getById(request.getSinkDatasourceConnectionId());
-    SchemaMetadataInfoResponse sinkMetadataInfoResponse = schemaMetadataService.getInfo(new SchemaMetadataInfoRequest(
-        sink.getDbType(),
-        sink.getUrl(),
-        sink.getUsername(),
-        sink.getPassword()
-    ));
+    Set<String> sourceTableColumnNames = sourceTableColumns.stream()
+                                                           .map(ColumnMetadataResponse::getName)
+                                                           .collect(Collectors.toSet());
 
-    // схемы ышил
-    HashMap<String, List<ColumnMetadataResponse>> sinkSchemaMetadata = sinkMetadataInfoResponse.getSchemaNameAndTables().get(request.getSinkTableName());
-    if (sinkSchemaMetadata == null) {
-      throw new RuntimeException("Нет такой схемы в целевой базе данных: " + request.getSinkSchemaName());
+    // все запрашиваемые столбцы должны быть в схеме данных
+    for (String columnName : requestColumnNamesForMapping) {
+      if (sourceTableColumnNames.contains(columnName)) {
+        throw new RuntimeException("Нет такого столбца в " + dataSourceType + " БД и таблице: " + tableName);
+      }
     }
-
-    // таблицы
-    List<ColumnMetadataResponse> sinkTableColumns = sourceSchemaMetadata.get(request.getSinkTableName());
-    if (sinkTableColumns == null) {
-      throw new RuntimeException("Нет такой таблицы в целевой схеме: " + request.getSinkSchemaName());
-    }
-
-    // если нам нужно создать новые схемы
-    if (request.isCreateNewSchema()) {
-      // todo подумай
-    }
-
-    // schema1
-    // table_name1
-    // columns -> column_type {10}
-
-    // schema2
-    // table_name2
-    // columns -> column_type {5}
-
-//    sourceSchemaM
-//    sourceTableColumns.get()
-    for (ColumnMetadataResponse columnMetadata : sourceTableColumns) {
-//      request.getSinkTableName()
-    }
-
-
   }
 }
