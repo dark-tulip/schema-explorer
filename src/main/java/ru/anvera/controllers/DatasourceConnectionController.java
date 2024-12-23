@@ -2,6 +2,7 @@ package ru.anvera.controllers;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,7 @@ public class DatasourceConnectionController {
   }
 
   @PostMapping("/validate/schema-mapping")
-  public TableMapping validateSchemaMapping(@RequestBody DatasourceConnectionValidateSchemaMappingRequest request) {
+  public TableMapping validateSchemaMapping(@RequestBody @Validated DatasourceConnectionValidateSchemaMappingRequest request) {
     return datasourceConnectionService.validateSchemaMapping(request);
   }
 

@@ -2,6 +2,7 @@ package ru.anvera.repos;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -36,7 +37,11 @@ public class DatasourceConnectionRepository {
 
   public DatasourceConnection getById(Long id) {
     String sql = "SELECT * FROM datasource_connections WHERE id = ?";
-    return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    try {
+      return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    } catch (EmptyResultDataAccessException e) {
+      throw new RuntimeException("R4Z24WXI :: Not found by id: " + id);
+    }
   }
 
   public Long save(DatasourceConnection connection) {

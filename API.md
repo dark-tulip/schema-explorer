@@ -1,4 +1,4 @@
-## Получить схему данных
+## Получить схему данных по датасурсу
 ```bash
 curl --location 'http://localhost:8081/info' \
 --header 'Content-Type: application/json' \
@@ -10,3 +10,23 @@ curl --location 'http://localhost:8081/info' \
 }'
 ```
 
+## Зарегистрировать маппинг полей из source в sink
+```bash
+curl --location 'http://localhost:8081/datasource/connection/validate/schema-mapping' \
+--header 'Content-Type: application/json' \
+--data '{
+  "sinkDbConnectionId": 7,
+  "sourceDbConnectionId": 6,
+  "sourceSchemaName": "public",
+  "sinkSchemaName": "public",
+  "sourceTableName": "sourcetable1",
+  "sinkTableName": "sinktable1",
+  "sourceColumnsList": ["columna", "columnb", "columnc"],
+  "sinkColumnsList": ["column1", "column2", "column3"],
+  "transformations": {
+    "column1": "UPPER(column1)",
+    "column3": "TO_DATE(column3, '\''YYYY-MM-DD'\'')"
+  }
+}
+'
+```

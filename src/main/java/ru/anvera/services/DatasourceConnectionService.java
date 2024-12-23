@@ -94,8 +94,8 @@ public class DatasourceConnectionService {
         DataSource.SINK
     );
 
-    if (request.getSinkColumnsList().size() == request.getSourceColumnsList().size()) {
-      throw new RuntimeException("Колво столбцов для маппинга source и sink таблицы должны быть равны");
+    if (request.getSinkColumnsList().size() != request.getSourceColumnsList().size()) {
+      throw new RuntimeException("Колво столбцов для маппинга source: " + request.getSourceColumnsList() + " и sink " + request.getSinkColumnsList() + " таблицы должны быть равны");
     }
 
     // сопоставить столбцы из source в sink таблицу
@@ -145,7 +145,7 @@ public class DatasourceConnectionService {
     // таблицы
     List<ColumnMetadataResponse> sourceTableColumns = sourceSchemaMetadata.get(tableName);
     if (sourceTableColumns == null) {
-      throw new RuntimeException("Нет такой таблицы в " + dataSourceType + " БД и схеме " + schemaName);
+      throw new RuntimeException("Нет такой таблицы " + tableName + " в " + dataSourceType + " БД и схеме " + schemaName);
     }
 
     Set<String> sourceTableColumnNames = sourceTableColumns.stream()
@@ -155,7 +155,7 @@ public class DatasourceConnectionService {
     // все запрашиваемые столбцы должны быть в схеме данных
     for (String columnName : requestColumnNamesForMapping) {
       if (sourceTableColumnNames.contains(columnName)) {
-        throw new RuntimeException("Нет такого столбца в " + dataSourceType + " БД и таблице: " + tableName);
+        throw new RuntimeException("Нет такого столбца " + columnName + " в " + dataSourceType + "  БД и таблице: " + tableName);
       }
     }
   }

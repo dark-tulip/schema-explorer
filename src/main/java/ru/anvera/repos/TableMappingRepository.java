@@ -53,7 +53,7 @@ public class TableMappingRepository {
         "sink_table, " +
         "source_to_sink_column_mapping, " +
         "transformations) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
+        "VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) RETURNING id";
 
     return jdbcTemplate.queryForObject(sql, new Object[]{
         mapping.getSourceDbConnectionId(),
