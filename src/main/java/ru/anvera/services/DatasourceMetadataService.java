@@ -35,6 +35,11 @@ public class DatasourceMetadataService {
     HashMap<String, HashMap<String, List<ColumnMetadataResponse>>> schemaNameAndTables = new HashMap<>();
 
     for (String schemaName : postgresDatabaseMetadataRepository.getSchemas()) {
+
+      if (skipInternalSchema(schemaName)) {
+        continue;
+      }
+
       HashMap<String, List<ColumnMetadataResponse>> tables = new HashMap<>();
 
       for (String tableName : postgresDatabaseMetadataRepository.getTableNames(schemaName)) {
@@ -55,5 +60,11 @@ public class DatasourceMetadataService {
     }
 
     return new DatasourceMetadataInfoResponse(schemaNameAndTables);
+  }
+
+  private boolean skipInternalSchema(String schemaName) {
+    return schemaName.equals("information_schema")
+        || schemaName.equals("pg_toast")
+        || schemaName.equals("pg_catalog");
   }
 }

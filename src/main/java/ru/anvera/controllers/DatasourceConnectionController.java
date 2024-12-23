@@ -4,14 +4,16 @@ package ru.anvera.controllers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
 import ru.anvera.services.DatasourceConnectionService;
 
+@RestController
 @RequiredArgsConstructor
-@RestController("/datasource/connection/")
+@RequestMapping("/datasource/connection/")
 public class DatasourceConnectionController {
 
   private final DatasourceConnectionService datasourceConnectionService;
