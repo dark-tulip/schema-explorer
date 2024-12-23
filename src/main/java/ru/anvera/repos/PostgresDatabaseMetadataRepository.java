@@ -8,7 +8,7 @@ import java.util.Map;
 
 
 @RequiredArgsConstructor
-public class DatabaseMetadataRepository {
+public class PostgresDatabaseMetadataRepository {
 
   private final JdbcTemplate jdbcTemplate;
 

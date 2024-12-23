@@ -4,7 +4,7 @@
 //import org.springframework.web.bind.annotation.GetMapping;
 //import org.springframework.web.bind.annotation.PathVariable;
 //import org.springframework.web.bind.annotation.RestController;
-//import ru.anvera.repos.DatabaseMetadataRepository;
+//import ru.anvera.repos.PostgresDatabaseMetadataRepository;
 //
 //import java.util.List;
 //import java.util.Map;
@@ -13,7 +13,7 @@
 //@RequiredArgsConstructor
 //public class DatabaseController {
 //
-//    private final DatabaseMetadataRepository databaseMetadataRepository;
+//    private final PostgresDatabaseMetadataRepository databaseMetadataRepository;
 //1
 //
 //    @GetMapping("/schemas")

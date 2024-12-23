@@ -7,7 +7,7 @@ import ru.anvera.factory.JdbcTemplateFactory;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
 import ru.anvera.models.response.SchemaMetadataInfoResponse;
-import ru.anvera.repos.DatabaseMetadataRepository;
+import ru.anvera.repos.PostgresDatabaseMetadataRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,15 +30,15 @@ public class SchemaMetadataService {
         );
 
     // create new repo for this data source
-    DatabaseMetadataRepository databaseMetadataRepository = new DatabaseMetadataRepository(jdbcTemplate);
+    PostgresDatabaseMetadataRepository postgresDatabaseMetadataRepository = new PostgresDatabaseMetadataRepository(jdbcTemplate);
 
     HashMap<String, HashMap<String, List<ColumnMetadataResponse>>> schemaNameAndTables = new HashMap<>();
 
-    for (String schemaName : databaseMetadataRepository.getSchemas()) {
+    for (String schemaName : postgresDatabaseMetadataRepository.getSchemas()) {
       HashMap<String, List<ColumnMetadataResponse>> tables = new HashMap<>();
 
-      for (String tableName : databaseMetadataRepository.getTableNames(schemaName)) {
-        List<ColumnMetadataResponse> columnsResponse = databaseMetadataRepository
+      for (String tableName : postgresDatabaseMetadataRepository.getTableNames(schemaName)) {
+        List<ColumnMetadataResponse> columnsResponse = postgresDatabaseMetadataRepository
             .getColumnMetadataBySchemaNameAndTableName(schemaName, tableName)
             .stream()
             .map(column -> new ColumnMetadataResponse(
@@ -53,6 +53,7 @@ public class SchemaMetadataService {
 
       schemaNameAndTables.put(schemaName, tables);
     }
+
     return new SchemaMetadataInfoResponse(schemaNameAndTables);
   }
 }

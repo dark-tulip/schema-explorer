@@ -25,6 +25,7 @@ dependencies {
 
     // PostgreSQL JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.liquibase:liquibase-core'
 
     // Jackson for JSON processing
     implementation 'com.fasterxml.jackson.core:jackson-databind'
