@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.anvera.models.DataSource;
 import ru.anvera.models.entity.DatasourceConnection;
+import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
@@ -61,7 +62,7 @@ public class DatasourceConnectionService {
    * есть еще sink datasource
    * из source мы выбираем схему и таблицу (и выборочно названия столбцов которые хотим перенести) в sink datasource,
    */
-  public void validateSchemaMapping(DatasourceConnectionValidateSchemaMappingRequest request) {
+  public TableMapping validateSchemaMapping(DatasourceConnectionValidateSchemaMappingRequest request) {
     // ****** source metadata ******
     validateSchemaMetadataForExistence(
         request.getSourceDatasourceConnectionId(),
@@ -85,13 +86,26 @@ public class DatasourceConnectionService {
     }
 
 
-//    tableMappingRepository.insert(
-//        new TableMapping(
-//
-//        )
-//    )
+    HashMap<String, String> sourceToSinkColumnNameMapping = new HashMap<>();
+    for (int i = 0; i < request.getSourceColumnsList().size(); i++) {
+      sourceToSinkColumnNameMapping.put(
+          request.getSourceColumnsList().get(i),
+          request.getSinkColumnsList().get(i)
+      );
+    }
 
+    Long id = tableMappingRepository.insert(
+        new TableMapping(null,
+            request.getSourceSchemaName(),
+            request.getSinkSchemaName(),
+            request.getSourceTableName(),
+            request.getSinkTableName(),
+            sourceToSinkColumnNameMapping,
+            request.getTransformations()
+        )
+    );
 
+    return tableMappingRepository.getById(id);
   }
 
   private void validateSchemaMetadataForExistence(Long datasourceConnectionId,

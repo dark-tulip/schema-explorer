@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.anvera.models.entity.TableMapping;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 @Repository
@@ -34,7 +32,9 @@ public class TableMappingRepository {
 
     try {
       mapping.setSourceToSinkColumnNameMapping(
-          sourceToSinkJson != null ? new ObjectMapper().readValue(sourceToSinkJson, HashMap.class) : null
+          sourceToSinkJson != null
+              ? new ObjectMapper().readValue(sourceToSinkJson, HashMap.class)
+              : null
       );
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -56,7 +56,7 @@ public class TableMappingRepository {
     return jdbcTemplate.queryForObject(sql, rowMapper, id);
   }
 
-  public int insert(TableMapping mapping) {
+  public Long insert(TableMapping mapping) {
     String sql = "INSERT INTO table_mapping (" +
         "source_schema_name, " +
         "sink_schema_name, " +
@@ -64,16 +64,16 @@ public class TableMappingRepository {
         "sink_table, " +
         "source_to_sink_column_mapping, " +
         "transformations) " +
-        "VALUES (?, ?, ?, ?, ?, ?)";
+        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
-    return jdbcTemplate.update(sql,
+    return jdbcTemplate.queryForObject(sql, new Object[]{
         mapping.getSourceSchemaName(),
         mapping.getSinkSchemaName(),
         mapping.getSourceTable(),
         mapping.getSinkTable(),
         toJson(mapping.getSourceToSinkColumnNameMapping()),
         toJson(mapping.getTransformations())
-    );
+    }, Long.class);
   }
 
   public int update(TableMapping mapping) {
