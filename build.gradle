@@ -29,6 +29,7 @@ dependencies {
 
     // Jackson for JSON processing
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.google.code.gson:gson:2.7'
 
     // Lombok for annotation processing
     compileOnly 'org.projectlombok:lombok'

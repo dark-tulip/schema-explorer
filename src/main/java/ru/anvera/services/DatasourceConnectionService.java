@@ -78,7 +78,7 @@ public class DatasourceConnectionService {
   public TableMapping validateSchemaMapping(DatasourceConnectionValidateSchemaMappingRequest request) {
     // ****** source metadata ******
     validateSchemaMetadataForExistence(
-        request.getSourceDatasourceConnectionId(),
+        request.getSourceDbConnectionId(),
         request.getSourceSchemaName(),
         request.getSourceTableName(),
         request.getSourceColumnsList(),
@@ -87,7 +87,7 @@ public class DatasourceConnectionService {
 
     // ****** sink metadata ******
     validateSchemaMetadataForExistence(
-        request.getSinkDatasourceConnectionId(),
+        request.getSinkDbConnectionId(),
         request.getSinkSchemaName(),
         request.getSinkTableName(),
         request.getSinkColumnsList(),
@@ -98,7 +98,7 @@ public class DatasourceConnectionService {
       throw new RuntimeException("Колво столбцов для маппинга source и sink таблицы должны быть равны");
     }
 
-
+    // сопоставить столбцы из source в sink таблицу
     HashMap<String, String> sourceToSinkColumnNameMapping = new HashMap<>();
     for (int i = 0; i < request.getSourceColumnsList().size(); i++) {
       sourceToSinkColumnNameMapping.put(
@@ -109,6 +109,8 @@ public class DatasourceConnectionService {
 
     Long id = tableMappingRepository.insert(
         new TableMapping(null,
+            request.getSourceDbConnectionId(),
+            request.getSinkDbConnectionId(),
             request.getSourceSchemaName(),
             request.getSinkSchemaName(),
             request.getSourceTableName(),

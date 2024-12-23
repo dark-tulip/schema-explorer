@@ -1,7 +1,8 @@
 package ru.anvera.repos;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -14,41 +15,27 @@ public class TableMappingRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
+  private final Gson gson = new Gson();
+
   public TableMappingRepository(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
 
   private final RowMapper<TableMapping> rowMapper = (rs, rowNum) -> {
-    TableMapping mapping = new TableMapping();
-    mapping.setId(rs.getLong("id"));
-    mapping.setSourceSchemaName(rs.getString("source_schema_name"));
-    mapping.setSinkSchemaName(rs.getString("sink_schema_name"));
-    mapping.setSourceTable(rs.getString("source_table"));
-    mapping.setSinkTable(rs.getString("sink_table"));
-
     // Deserialize JSON to HashMap for column mapping
     String sourceToSinkJson    = rs.getString("source_to_sink_column_mapping");
     String transformationsJson = rs.getString("transformations");
 
-    try {
-      mapping.setSourceToSinkColumnNameMapping(
-          sourceToSinkJson != null
-              ? new ObjectMapper().readValue(sourceToSinkJson, HashMap.class)
-              : null
-      );
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-
-    try {
-      mapping.setTransformations(
-          transformationsJson != null ? new ObjectMapper().readValue(transformationsJson, HashMap.class) : null
-      );
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-
-    return mapping;
+    return new TableMapping(
+        rs.getLong("id"),
+        rs.getLong("sink_db_connection_id"),
+        rs.getLong("source_db_connection_id"),
+        rs.getString("source_schema_name"),
+        rs.getString("sink_schema_name"),
+        rs.getString("source_table"),
+        rs.getString("sink_table"),
+        parseJsonToHashMap(sourceToSinkJson),
+        parseJsonToHashMap(transformationsJson));
   };
 
   public TableMapping getById(Long id) {
@@ -58,15 +45,19 @@ public class TableMappingRepository {
 
   public Long insert(TableMapping mapping) {
     String sql = "INSERT INTO table_mapping (" +
+        "source_db_connection_id, " +
+        "sink_db_connection_id, " +
         "source_schema_name, " +
         "sink_schema_name, " +
         "source_table, " +
         "sink_table, " +
         "source_to_sink_column_mapping, " +
         "transformations) " +
-        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
     return jdbcTemplate.queryForObject(sql, new Object[]{
+        mapping.getSourceDbConnectionId(),
+        mapping.getSinkDbConnectionId(),
         mapping.getSourceSchemaName(),
         mapping.getSinkSchemaName(),
         mapping.getSourceTable(),
@@ -108,5 +99,12 @@ public class TableMappingRepository {
     } catch (Exception e) {
       throw new RuntimeException("Error converting object to JSON", e);
     }
+  }
+
+  private HashMap<String, String> parseJsonToHashMap(String json) {
+    return json != null
+        ? gson.fromJson(json, new TypeToken<HashMap<String, String>>() {
+    }.getType())
+        : null;
   }
 }

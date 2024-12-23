@@ -13,8 +13,8 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DatasourceConnectionValidateSchemaMappingRequest {
-  private Long sinkDatasourceConnectionId;
-  private Long sourceDatasourceConnectionId;
+  private Long sinkDbConnectionId;
+  private Long sourceDbConnectionId;
 
   // схема
   private String sourceSchemaName;

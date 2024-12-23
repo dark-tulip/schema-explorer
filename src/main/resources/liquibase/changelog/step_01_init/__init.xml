@@ -36,4 +36,13 @@
         </sql>
     </changeSet>
 
+    <changeSet id="3-7IGQ9Y1E" author="ttelbayvea">
+        <sql>
+            ALTER TABLE table_mapping
+                ADD COLUMN sink_db_connection_id bigint;
+            ALTER TABLE table_mapping
+                ADD COLUMN source_db_connection_id bigint;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
