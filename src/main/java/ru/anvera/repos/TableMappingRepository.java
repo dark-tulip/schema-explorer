@@ -28,8 +28,8 @@ public class TableMappingRepository {
 
     return new TableMapping(
         rs.getLong("id"),
-        rs.getLong("sink_db_connection_id"),
         rs.getLong("source_db_connection_id"),
+        rs.getLong("sink_db_connection_id"),
         rs.getString("source_schema_name"),
         rs.getString("sink_schema_name"),
         rs.getString("source_table"),

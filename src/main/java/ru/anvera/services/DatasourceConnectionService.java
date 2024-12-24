@@ -4,9 +4,9 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.anvera.models.enums.DataSource;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
+import ru.anvera.models.enums.DataSource;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
 import ru.anvera.models.request.SchemaMetadataInfoRequest;
@@ -137,25 +137,25 @@ public class DatasourceConnectionService {
     ));
 
     // схемы
-    HashMap<String, List<ColumnMetadataResponse>> sourceSchemaMetadata = dbMetadataInfoResponse.getSchemaNameAndTables().get(schemaName);
-    if (sourceSchemaMetadata == null) {
+    HashMap<String, List<ColumnMetadataResponse>> schemaMetadata = dbMetadataInfoResponse.getSchemaNameAndTables().get(schemaName);
+    if (schemaMetadata == null) {
       throw new RuntimeException("Нет такой схемы в " + schemaName + " БД " + dataSourceType);
     }
 
     // таблицы
-    List<ColumnMetadataResponse> sourceTableColumns = sourceSchemaMetadata.get(tableName);
-    if (sourceTableColumns == null) {
+    List<ColumnMetadataResponse> tableColumns = schemaMetadata.get(tableName);
+    if (tableColumns == null) {
       throw new RuntimeException("Нет такой таблицы " + tableName + " в " + dataSourceType + " БД и схеме " + schemaName);
     }
 
-    Set<String> sourceTableColumnNames = sourceTableColumns.stream()
-                                                           .map(ColumnMetadataResponse::getName)
-                                                           .collect(Collectors.toSet());
+    Set<String> tableColumnNames = tableColumns.stream()
+                                               .map(ColumnMetadataResponse::getName)
+                                               .collect(Collectors.toSet());
 
     // все запрашиваемые столбцы должны быть в схеме данных
     for (String columnName : requestColumnNamesForMapping) {
-      if (sourceTableColumnNames.contains(columnName)) {
-        throw new RuntimeException("Нет такого столбца " + columnName + " в " + dataSourceType + "  БД и таблице: " + tableName);
+      if (!tableColumnNames.contains(columnName)) {
+        throw new RuntimeException("Нет такого столбца " + columnName + " в " + dataSourceType + "  БД и таблице: " + tableName + " dbConnection: " + dbConnection);
       }
     }
   }

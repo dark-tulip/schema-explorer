@@ -10,6 +10,7 @@ import ru.anvera.models.enums.ConnectorDrivers;
 import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.TableMappingRepository;
 
+import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,9 +100,17 @@ public class SourceConnectorConfigGenerator {
   }
 
   private static String extractPort(String url) {
-    return url.split(":")[2].split("/")[0];
+    try {
+      URI uri = new URI(url.substring(5)); // Удаляем "jdbc:" для корректной обработки
+      return String.valueOf(uri.getPort());
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Invalid URL format: " + url, e);
+    }
   }
 
+  public static void main(String[] args) {
+    System.out.println(extractPort("jdbc:postgresql://localhost:5432/test2"));
+  }
   private static void saveToFile(JsonObject json, String fileName) {
     try (java.io.FileWriter writer = new java.io.FileWriter(fileName)) {
       Gson gson = new Gson();
