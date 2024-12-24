@@ -4,7 +4,7 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.anvera.models.DataSource;
+import ru.anvera.models.enums.DataSource;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;

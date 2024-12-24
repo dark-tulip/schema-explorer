@@ -1,4 +1,4 @@
-package ru.anvera.models;
+package ru.anvera.models.enums;
 
 /**
  * Source - стро
