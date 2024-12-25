@@ -3,7 +3,6 @@ package ru.anvera.controllers;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,10 +23,10 @@ public class ConnectorConfigFileGeneratorController {
    * @return сгенерированный JsonObject,
    * благодаря которому можно зарегистрировать коннектор с помощью curl вызова в кластере кафки
    */
-  @GetMapping("/generate/source")
-  public ResponseEntity<String> generateSourceConnectorConfig(@RequestParam Long tableMappingId) {
+  @GetMapping(value = "/generate/source", produces = "application/json")
+  public String generateSourceConnectorConfig(@RequestParam Long tableMappingId) {
     JsonObject object = sourceConnectorConfigGenerator.generateSourceConnectorConfig(tableMappingId);
-    return ResponseEntity.ok(object.toString());
+    return object.toString();
   }
 
   @GetMapping("/generate/sink")

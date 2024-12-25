@@ -1,5 +1,76 @@
 version: '3.8'
 services:
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"  # рort к интерфейсу
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: kafka-1:19092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: debezium-connect
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://debezium-connect:8083
+      KAFKA_CLUSTERS_0_KAFKACONNECT_1_NAME: mongo-sink-connector
+      KAFKA_CLUSTERS_0_KAFKACONNECT_1_ADDRESS: http://mongo-sink-connector:8084
+      KAFKA_CLUSTERS_0_KAFKACONNECT_2_NAME: pg-sink
+      KAFKA_CLUSTERS_0_KAFKACONNECT_2_ADDRESS: http://pg-sink:8085
+    depends_on:
+      - kafka-1
+      - debezium-connect
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+    ports:
+      - "2181:2181"
+
+  kafka-1:
+    image: confluentinc/cp-kafka:7.2.1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Вернуть 3 для трех брокеров по дефолту
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+    depends_on:
+      - zookeeper
+
+  #  kafka-2:
+  #    image: confluentinc/cp-kafka:7.2.1
+  #    ports:
+  #      - "9093:9093"
+  #      - "29093:29093"
+  #    environment:
+  #      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
+  #      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+  #      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  #      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #      KAFKA_BROKER_ID: 2
+  #    depends_on:
+  #      - zookeeper
+  #
+  #  kafka-3:
+  #    image: confluentinc/cp-kafka:7.2.1
+  #    ports:
+  #      - "9094:9094"
+  #      - "29094:29094"
+  #    environment:
+  #      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
+  #      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+  #      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  #      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+  #      KAFKA_BROKER_ID: 3
+  #    depends_on:
+  #      - zookeeper
+
   postgres:
     image: postgres:15
     container_name: local_postgres
@@ -11,6 +82,31 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"  # https://debezium.io/documentation/reference/stable/connectors/postgresql.html#:~:text=Configuring%20the%20PostgreSQL-,server,-If%20you%20are
+      # -c shared_preload_libraries='pg_stat_statements'
+
+  debezium-connect:
+    image: debezium/connect:2.7.0.Final
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: "kafka-1:19092"  # "kafka-1:19092,kafka-2:19093,kafka-3:19094"
+      GROUP_ID: "1"
+      CONFIG_STORAGE_TOPIC: "connect-configs"
+      OFFSET_STORAGE_TOPIC: "connect-offsets"
+      STATUS_STORAGE_TOPIC: "connect-status"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
+      CONNECT_PLUGIN_PATH: "/kafka/connect,/debezium-connector-postgres,/debezium-connector-mongodb"
+    depends_on:
+      - kafka-1
+      - postgres
 
 volumes:
   postgres_data:

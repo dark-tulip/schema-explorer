@@ -37,7 +37,6 @@ curl --location 'http://localhost:8081/datasource/connection/validate/schema-map
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @postgresql-source-connector-config.json
 ```
 
-
 ## Json генератор пропертей коннектора
 
 ```bash
