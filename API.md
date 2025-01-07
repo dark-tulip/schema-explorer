@@ -1,5 +1,19 @@
-// todo upd
-## Получить схему данных по датасурсу
+# 1. Quick start
+
+1. локально поднимите сервисы
+
+```bash
+docker compose up
+```
+
+2. После запустите приложение из класса Main (зеленая стрелка запуска в IDEA)
+3. После можно вызывать АПИ которые есть в сервисе. Контракты описаны ниже
+
+--- 
+
+# 2. Schema explorer REST API
+
+## Получить схему данных по источнику данных
 ```bash
 curl --location 'http://localhost:8081/info' \
 --header 'Content-Type: application/json' \
@@ -12,6 +26,7 @@ curl --location 'http://localhost:8081/info' \
 ```
 
 ## Зарегистрировать маппинг полей из source в sink
+- описывает каким образом мы хотим сопоставить поля из источника в целевую БД
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/validate/schema-mapping' \
 --header 'Content-Type: application/json' \
@@ -32,13 +47,19 @@ curl --location 'http://localhost:8081/datasource/connection/validate/schema-map
 '
 ```
 
-## Настроить source connector (PG -> Kafka)
-```bash
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @postgresql-source-connector-config.json
-```
+Данные будут сохраняться в таблице `table_mapping`
 
 ## Json генератор пропертей коннектора
 
+- еще не доработанное АПИ, созает `source-postgres-connector.json` файл, который нужен для регистрации коннектора
+
 ```bash
 curl --location 'http://localhost:8081/connector/configs/generate/source?tableMappingId=1'
+```
+
+# 3. Вспомогательные curl 
+
+## Настроить source connector (PG -> Kafka)
+```bash
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @postgresql-source-connector-config.json
 ```
