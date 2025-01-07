@@ -49,7 +49,7 @@ curl --location 'http://localhost:8081/datasource/connection/validate/schema-map
 
 Данные будут сохраняться в таблице `table_mapping`
 
-## Json генератор пропертей коннектора
+## Генератор пропертей для регистрации нового коннектора
 
 - еще не доработанное АПИ, созает `source-postgres-connector.json` файл, который нужен для регистрации коннектора
 
