@@ -35,6 +35,7 @@ public class DatasourceConnectionValidateSchemaMappingRequest {
   private List<String> sourceColumnsList;
   private List<String> sinkColumnsList;
 
+  // Преобразования, применяемые к данным. При перемещении из source в sink
   private HashMap<String, String> transformations;
 
 }

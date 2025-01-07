@@ -18,17 +18,15 @@ public class DatasourceConnectionRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
-  private final RowMapper<DatasourceConnection> rowMapper = (rs, rowNum) -> {
-    DatasourceConnection connection = new DatasourceConnection();
-    connection.setId(rs.getLong("id"));
-    connection.setDbType(rs.getString("db_type"));
-    connection.setUrl(rs.getString("url"));
-    connection.setUsername(rs.getString("username"));
-    connection.setPassword(rs.getString("password"));
-    connection.setIsActive(rs.getBoolean("is_active"));
-    connection.setDatasourceType(rs.getString("datasource_type"));
-    return connection;
-  };
+  private final RowMapper<DatasourceConnection> rowMapper = (rs, rowNum) -> new DatasourceConnection(
+      rs.getLong("id"),
+      rs.getString("db_type"),
+      rs.getString("url"),
+      rs.getString("username"),
+      rs.getString("password"),
+      rs.getBoolean("is_active"),
+      rs.getString("datasource_type")
+  );
 
   public List<DatasourceConnection> findAll() {
     String sql = "SELECT * FROM datasource_connections";
