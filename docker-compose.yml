@@ -75,18 +75,19 @@ services:
     image: postgres:15
     container_name: local_postgres
     environment:
-      POSTGRES_DB: your_database
-      POSTGRES_USER: your_username
-      POSTGRES_PASSWORD: your_password
+      # system db init properties
+      POSTGRES_DB: internaldb
+      POSTGRES_USER: internal_usr
+      POSTGRES_PASSWORD: internalusrpwd
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    command:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # создаем несколько тестовых БД c пользователями
+    command: # Необходимое условие для CDC Debezium
       - "postgres"
       - "-c"
       - "wal_level=logical"  # https://debezium.io/documentation/reference/stable/connectors/postgresql.html#:~:text=Configuring%20the%20PostgreSQL-,server,-If%20you%20are
-      # -c shared_preload_libraries='pg_stat_statements'
 
   debezium-connect:
     image: debezium/connect:2.7.0.Final
