@@ -4,14 +4,17 @@
 CREATE DATABASE source_db;
 CREATE USER user1 WITH PASSWORD 'user1pwd';
 ALTER DATABASE source_db OWNER TO user1;
+GRANT ALL PRIVILEGES ON DATABASE source_db TO user1;
 
 -- 2. Sink database (тестовый пример источника БД куда кладут данные)
 CREATE DATABASE sink_db;
 CREATE USER user2 WITH PASSWORD 'user2pwd';
 ALTER DATABASE sink_db OWNER TO user2;
+GRANT ALL PRIVILEGES ON DATABASE sink_db TO user2;
+
 
 -- =========================== 1.1 Подключение к source_db ===============================
-\connect source_db;
+\c source_db user1
 
 -- Создание таблицы и вставка данных
 CREATE TABLE books
