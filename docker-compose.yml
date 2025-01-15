@@ -1,9 +1,9 @@
 version: '3.8'
 services:
 
-  kafka-ui:
+  kafkaui:
     image: provectuslabs/kafka-ui:latest
-    container_name: kafka-ui
+    container_name: kafkaui
     ports:
       - "8080:8080"  # рort к интерфейсу
     environment:
