@@ -106,23 +106,38 @@ curl --location 'http://localhost:8081/datasource/connection/add' \
 curl --location 'http://localhost:8081/datasource/connection/validate/schema-mapping' \
 --header 'Content-Type: application/json' \
 --data '{
-  "sinkDbConnectionId": 7,
-  "sourceDbConnectionId": 6,
+  "sourceDbConnectionId": 1,
+  "sinkDbConnectionId": 2,
   "sourceSchemaName": "public",
   "sinkSchemaName": "public",
-  "sourceTableName": "sourcetable1",
-  "sinkTableName": "sinktable1",
-  "sourceColumnsList": ["columna", "columnb", "columnc"],
-  "sinkColumnsList": ["column1", "column2", "column3"],
-  "transformations": {
-    "column1": "UPPER(column1)",
-    "column3": "TO_DATE(column3, '\''YYYY-MM-DD'\'')"
-  }
+  "sourceTableName": "books",
+  "sinkTableName": "books",
+  "sourceColumnsList": ["id", "title", "author"],
+  "sinkColumnsList": ["id", "title", "author"],
+  "transformations": null
 }
 '
 ```
+resposne:
+```json
+{
+    "id": 1,
+    "sourceDbConnectionId": 1,
+    "sinkDbConnectionId": 2,
+    "sourceSchemaName": "public",
+    "sinkSchemaName": "public",
+    "sourceTable": "books",
+    "sinkTable": "books",
+    "sourceToSinkColumnNameMapping": {
+        "author": "author",
+        "id": "id",
+        "title": "title"
+    },
+    "transformations": null
+}
+```
 
-Данные будут сохраняться в таблице `table_mapping`
+Данные о сопоставленных полях хранятся в таблице `table_mapping`
 
 ## Генератор пропертей для регистрации нового коннектора
 
@@ -132,6 +147,31 @@ curl --location 'http://localhost:8081/datasource/connection/validate/schema-map
 curl --location 'http://localhost:8081/connector/configs/generate/source?tableMappingId=1'
 ```
 
+```json
+{
+  "name":"postgresql-connector-1",
+  "config": {
+    "connector.class":"io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max":"1",
+    "database.hostname":"localhost",
+    "database.port":"5432",
+    "database.user":"user1",
+    "database.password":"user1pwd",
+    "database.dbname":"source_db",
+    "topic.prefix":"public.books",
+    "schema.include.list":"public",
+    "table.include.list":"public.books",
+    "column.include.list":"public.books.author,public.books.id,public.books.title",
+    "plugin.name":"pgoutput",
+    "transforms":"unwrap",
+    "transforms.unwrap.type":"io.debezium.transforms.ExtractNewRecordState",
+    "key.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "value.converter":"org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable":"true",
+    "value.converter.schemas.enable":"true"
+  }
+}
+```
 # 3. Вспомогательные curl 
 
 ## Настроить source connector (PG -> Kafka)
