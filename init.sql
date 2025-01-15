@@ -33,3 +33,16 @@ VALUES ('1984', 'George Orwell', 1949),
        ('The Catcher in the Rye', 'J.D. Salinger', 1951);
 
 -- ======================================================================================
+
+-- =========================== 1.2 Подключение к sink_db ===============================
+\c sink_db user2
+
+-- Создание таблицы и вставка данных
+CREATE TABLE books
+(
+    id             BIGSERIAL PRIMARY KEY,
+    title          text NOT NULL,
+    author         text NOT NULL,
+    published_year INTEGER
+);
+-- ======================================================================================
