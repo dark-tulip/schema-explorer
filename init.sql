@@ -5,12 +5,14 @@ CREATE DATABASE source_db;
 CREATE USER user1 WITH PASSWORD 'user1pwd';
 ALTER DATABASE source_db OWNER TO user1;
 GRANT ALL PRIVILEGES ON DATABASE source_db TO user1;
+ALTER USER user1 WITH SUPERUSER; -- чтобы мочь апдейтить системные параметры
 
 -- 2. Sink database (тестовый пример источника БД куда кладут данные)
 CREATE DATABASE sink_db;
 CREATE USER user2 WITH PASSWORD 'user2pwd';
 ALTER DATABASE sink_db OWNER TO user2;
 GRANT ALL PRIVILEGES ON DATABASE sink_db TO user2;
+ALTER USER user2 WITH SUPERUSER;
 
 
 -- =========================== 1.1 Подключение к source_db ===============================
@@ -31,6 +33,12 @@ VALUES ('1984', 'George Orwell', 1949),
        ('The Great Gatsby', 'F. Scott Fitzgerald', 1925),
        ('Pride and Prejudice', 'Jane Austen', 1813),
        ('The Catcher in the Rye', 'J.D. Salinger', 1951);
+
+-- Установить wal_level на уровне базы данных
+ALTER SYSTEM SET wal_level = 'logical';
+
+-- Перезагрузить конфигурацию для применения изменений
+SELECT pg_reload_conf();
 
 -- ======================================================================================
 
