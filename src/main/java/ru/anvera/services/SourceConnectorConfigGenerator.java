@@ -23,6 +23,7 @@ public class SourceConnectorConfigGenerator {
 
   private final DatasourceConnectionRepository datasourceConnectionRepository;
   private final TableMappingRepository         tableMappingRepository;
+  private static final String DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
 
   public JsonObject generateSourceConnectorConfig(Long tableMappingId) {
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
@@ -65,7 +66,9 @@ public class SourceConnectorConfigGenerator {
     JsonObject configDetails = new JsonObject();
     configDetails.addProperty("connector.class", ConnectorDrivers.DEBEZIUM_TO_POSTGRES.getDriverName());
     configDetails.addProperty("tasks.max", "1");
-    configDetails.addProperty("database.hostname", extractHostname(url));
+    // todo пока тестим через докеоркомпозер
+    configDetails.addProperty("database.hostname", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME);
+//    configDetails.addProperty("database.hostname", extractHostname(url));
     configDetails.addProperty("database.port", extractPort(url));
     configDetails.addProperty("database.user", username);
     configDetails.addProperty("database.password", password);
