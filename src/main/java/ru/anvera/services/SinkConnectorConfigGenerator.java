@@ -1,6 +1,5 @@
 package ru.anvera.services;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,6 @@ public class SinkConnectorConfigGenerator {
     String       tableName    = tableMapping.getSinkTable();
     String       schemaName   = tableMapping.getSinkSchemaName();
 
-    // Данные из таблицы datasource_connections
     DatasourceConnection connection       = datasourceConnectionRepository.getById(tableMapping.getSinkDbConnectionId());
     DatasourceConnection sourceConnection = datasourceConnectionRepository.getById(tableMapping.getSourceDbConnectionId());
 
@@ -36,13 +34,7 @@ public class SinkConnectorConfigGenerator {
     String password  = connection.getPassword();
     String topicName = generateTopicName(extractDbNameFromUrl(sourceConnection.getUrl()), schemaName, tableName);
 
-    // Генерация конфигурации
-    JsonObject config = generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
-
-    // Сохранение JSON в файл
-    // saveToFile(config, dbType + "-sink-connector-config.json");
-
-    return config;
+    return generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
   }
 
   private static JsonObject generateConnectorConfig(
@@ -51,7 +43,6 @@ public class SinkConnectorConfigGenerator {
 
     log.warn("81C5XOYS :: created sink connector to topic: " + topicName);
 
-    // Создание конфигурации
     JsonObject config = new JsonObject();
     config.addProperty("name", dbType + "sink-connector-" + id);
 
@@ -83,12 +74,4 @@ public class SinkConnectorConfigGenerator {
     return url.substring(url.lastIndexOf("/") + 1);
   }
 
-  private static void saveToFile(JsonObject json, String fileName) {
-    try (java.io.FileWriter writer = new java.io.FileWriter(fileName)) {
-      Gson gson = new Gson();
-      gson.toJson(json, writer);
-    } catch (Exception e) {
-      throw new RuntimeException("Ошибка при сохранении JSON-файла", e);
-    }
-  }
 }

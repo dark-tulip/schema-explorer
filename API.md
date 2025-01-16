@@ -172,23 +172,17 @@ curl --location 'http://localhost:8081/connector/configs/generate/source?tableMa
   }
 }
 ```
-# 3. Вспомогательные curl 
+# 4. Регистрация коннекторов 
 
 
-### 3.1 Для регистрации Source коннектора:
+### 4.1 Для регистрации Source коннектора:
 
 ```bash
-curl -X POST "http://localhost:8080/connectors/register/source?configFilePath=/path/to/postgresql-sink-connector-config.json"
+curl --location --request POST 'http://localhost:8081/connectors/register/source?tableMappingId=1'
 ```
 
-### 3.2 Для регистрации Sink коннектора:
+### 4.2 Для регистрации Sink коннектора:
 
 ```bash
-curl -X POST "http://localhost:8080/connectors/register/sink?configFilePath=/path/to/postgresql-sink-connector-config.json"
-```
-
-
-## Опционально Настроить source connector (PG -> Kafka) (чтобы зарегистироват своими ручками)
-```bash
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @postgresql-sink-connector-config.json
+curl --location --request POST 'http://localhost:8081/connectors/register/sink?tableMappingId=1'
 ```
