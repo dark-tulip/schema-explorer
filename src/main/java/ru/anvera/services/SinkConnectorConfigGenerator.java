@@ -3,6 +3,7 @@ package ru.anvera.services;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
@@ -12,6 +13,7 @@ import ru.anvera.repos.TableMappingRepository;
 /**
  * Генерирует файл с пропертями для таблицы ПОЛУЧАТЕЛЯ (то, куда записываем данные из Kafka).
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SinkConnectorConfigGenerator {
@@ -23,27 +25,31 @@ public class SinkConnectorConfigGenerator {
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
     String       tableName    = tableMapping.getSinkTable();
     String       schemaName   = tableMapping.getSinkSchemaName();
-    String       topicName    = generateTopicName(schemaName, tableName);
 
     // Данные из таблицы datasource_connections
-    DatasourceConnection connection = datasourceConnectionRepository.getById(tableMapping.getSinkDbConnectionId());
-    String               dbType     = connection.getDbType();
-    String               url        = connection.getUrl();
-    String               username   = connection.getUsername();
-    String               password   = connection.getPassword();
+    DatasourceConnection connection       = datasourceConnectionRepository.getById(tableMapping.getSinkDbConnectionId());
+    DatasourceConnection sourceConnection = datasourceConnectionRepository.getById(tableMapping.getSourceDbConnectionId());
+
+    String dbType    = connection.getDbType();
+    String url       = connection.getUrl();
+    String username  = connection.getUsername();
+    String password  = connection.getPassword();
+    String topicName = generateTopicName(extractDbNameFromUrl(sourceConnection.getUrl()), schemaName, tableName);
 
     // Генерация конфигурации
-    JsonObject config = generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, schemaName, tableName, topicName);
+    JsonObject config = generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
 
     // Сохранение JSON в файл
-    saveToFile(config, dbType + "-sink-connector-config.json");
+    // saveToFile(config, dbType + "-sink-connector-config.json");
 
     return config;
   }
 
   private static JsonObject generateConnectorConfig(
       long id, String dbType, String url, String username, String password,
-      String schemaName, String tableName, String topicName) {
+      String tableName, String topicName) {
+
+    log.warn("81C5XOYS :: created sink connector to topic: " + topicName);
 
     // Создание конфигурации
     JsonObject config = new JsonObject();
@@ -69,8 +75,8 @@ public class SinkConnectorConfigGenerator {
     return config;
   }
 
-  private static String generateTopicName(String schemaName, String tableName) {
-    return schemaName + "." + tableName;
+  private static String generateTopicName(String dbName, String schemaName, String tableName) {
+    return dbName + "." + schemaName + "." + tableName;
   }
 
   private static String extractDbNameFromUrl(String url) {
