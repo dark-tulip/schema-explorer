@@ -1,6 +1,5 @@
 package ru.anvera.services;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +20,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SourceConnectorConfigGenerator {
 
-  private final        DatasourceConnectionRepository datasourceConnectionRepository;
-  private final        TableMappingRepository         tableMappingRepository;
-  private static final String                         DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
+  private final DatasourceConnectionRepository datasourceConnectionRepository;
+  private final TableMappingRepository         tableMappingRepository;
+
+  private static final String DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
 
   public JsonObject generateSourceConnectorConfig(Long tableMappingId) {
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
@@ -31,20 +31,14 @@ public class SourceConnectorConfigGenerator {
     String       schemaName   = tableMapping.getSourceSchemaName();
     Set<String>  tableColumns = tableMapping.getSourceToSinkColumnNameMapping().keySet();
 
-    // Данные из таблицы datasource_connections
     DatasourceConnection connection = datasourceConnectionRepository.getById(tableMapping.getSourceDbConnectionId());
-    String               dbType     = connection.getDbType();
-    String               url        = connection.getUrl();
-    String               username   = connection.getUsername();
-    String               password   = connection.getPassword();
 
-    // Генерация конфигурации
-    JsonObject config = generateConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, username, password, schemaName, tableName, tableColumns);
+    String dbType   = connection.getDbType();
+    String url      = connection.getUrl();
+    String username = connection.getUsername();
+    String password = connection.getPassword();
 
-    // Сохранение JSON в файл
-    saveToFile(config, dbType + "-source-connector-config.json");
-
-    return config;
+    return generateConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, username, password, schemaName, tableName, tableColumns);
   }
 
   private static JsonObject generateConnectorConfig(
@@ -58,7 +52,6 @@ public class SourceConnectorConfigGenerator {
 
     String dbName = extractDbNameFromUrl(url);
 
-    // Создание конфигурации
     JsonObject config = new JsonObject();
     config.addProperty("name", dbType + "-connector-" + id);
 
@@ -107,19 +100,6 @@ public class SourceConnectorConfigGenerator {
       return String.valueOf(uri.getPort());
     } catch (Exception e) {
       throw new IllegalArgumentException("Invalid URL format: " + url, e);
-    }
-  }
-
-  public static void main(String[] args) {
-    System.out.println(extractPort("jdbc:postgresql://localhost:5432/test2"));
-  }
-
-  private static void saveToFile(JsonObject json, String fileName) {
-    try (java.io.FileWriter writer = new java.io.FileWriter(fileName)) {
-      Gson gson = new Gson();
-      gson.toJson(json, writer);
-    } catch (Exception e) {
-      throw new RuntimeException("Ошибка при сохранении JSON-файла", e);
     }
   }
 }

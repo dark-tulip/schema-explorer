@@ -9,20 +9,20 @@ import ru.anvera.models.enums.DataSource;
 import ru.anvera.services.ConnectorRegistrationService;
 
 @RestController
-@RequestMapping("/connectors")
+@RequestMapping("/connectors/register")
 @RequiredArgsConstructor
-public class ConnectorController {
+public class ConnectorRegisterController {
 
-  private final ConnectorRegistrationService registrationService;
+  private final ConnectorRegistrationService connectorRegistrationService;
 
-  @PostMapping("/register/source")
+  @PostMapping("/source")
   public void registerSourceConnector(@RequestParam Long tableMappingId) throws Exception {
-    registrationService.registerConnector(tableMappingId, DataSource.SOURCE.toString());
+    connectorRegistrationService.registerConnector(tableMappingId, DataSource.SOURCE.toString());
   }
 
-  @PostMapping("/register/sink")
+  @PostMapping("/sink")
   public void registerSinkConnector(@RequestParam Long tableMappingId) throws Exception {
-    registrationService.registerConnector(tableMappingId, DataSource.SINK.toString());
+    connectorRegistrationService.registerConnector(tableMappingId, DataSource.SINK.toString());
   }
 
 }
