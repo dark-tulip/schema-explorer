@@ -21,15 +21,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SourceConnectorConfigGenerator {
 
-  private final DatasourceConnectionRepository datasourceConnectionRepository;
-  private final TableMappingRepository         tableMappingRepository;
-  private static final String DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
+  private final        DatasourceConnectionRepository datasourceConnectionRepository;
+  private final        TableMappingRepository         tableMappingRepository;
+  private static final String                         DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
 
   public JsonObject generateSourceConnectorConfig(Long tableMappingId) {
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
     String       tableName    = tableMapping.getSourceTable();
     String       schemaName   = tableMapping.getSourceSchemaName();
-    String       topicPrefix  = generateTopicPrefix(schemaName, tableName);
     Set<String>  tableColumns = tableMapping.getSourceToSinkColumnNameMapping().keySet();
 
     // Данные из таблицы datasource_connections
@@ -40,7 +39,7 @@ public class SourceConnectorConfigGenerator {
     String               password   = connection.getPassword();
 
     // Генерация конфигурации
-    JsonObject config = generateConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, username, password, schemaName, tableName, tableColumns, topicPrefix);
+    JsonObject config = generateConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, username, password, schemaName, tableName, tableColumns);
 
     // Сохранение JSON в файл
     saveToFile(config, dbType + "-source-connector-config.json");
@@ -50,7 +49,7 @@ public class SourceConnectorConfigGenerator {
 
   private static JsonObject generateConnectorConfig(
       long id, String dbType, String url, String username, String password,
-      String schemaName, String tableName, Set<String> tableColumns, String topicPrefix) {
+      String schemaName, String tableName, Set<String> tableColumns) {
 
     // wrap columns
     String formattedColumnNames = tableColumns.stream()
@@ -66,14 +65,18 @@ public class SourceConnectorConfigGenerator {
     JsonObject configDetails = new JsonObject();
     configDetails.addProperty("connector.class", ConnectorDrivers.DEBEZIUM_TO_POSTGRES.getDriverName());
     configDetails.addProperty("tasks.max", "1");
-    // todo пока тестим через докеоркомпозер
-    configDetails.addProperty("database.hostname", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME);
-//    configDetails.addProperty("database.hostname", extractHostname(url));
+    // пока тестим через докеоркомпозер
+    configDetails.addProperty("database.hostname", extractHostname(url).replaceAll("localhost", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME));
     configDetails.addProperty("database.port", extractPort(url));
     configDetails.addProperty("database.user", username);
     configDetails.addProperty("database.password", password);
     configDetails.addProperty("database.dbname", dbName);
-    configDetails.addProperty("topic.prefix", topicPrefix);
+
+    /*
+     *  Debezium использует следующий формат для топиков:
+     *  <topic.prefix>.<schema_name>.<table_name>
+     */
+    configDetails.addProperty("topic.prefix", dbName);
     configDetails.addProperty("schema.include.list", schemaName);
     configDetails.addProperty("table.include.list", schemaName + "." + tableName);
     configDetails.addProperty("column.include.list", formattedColumnNames);
@@ -88,10 +91,6 @@ public class SourceConnectorConfigGenerator {
     config.add("config", configDetails);
 
     return config;
-  }
-
-  private static String generateTopicPrefix(String schemaName, String tableName) {
-    return schemaName + "." + tableName;
   }
 
   private static String extractDbNameFromUrl(String url) {
@@ -114,6 +113,7 @@ public class SourceConnectorConfigGenerator {
   public static void main(String[] args) {
     System.out.println(extractPort("jdbc:postgresql://localhost:5432/test2"));
   }
+
   private static void saveToFile(JsonObject json, String fileName) {
     try (java.io.FileWriter writer = new java.io.FileWriter(fileName)) {
       Gson gson = new Gson();
