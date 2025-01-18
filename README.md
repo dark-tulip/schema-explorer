@@ -139,39 +139,6 @@ resposne:
 
 Данные о сопоставленных полях хранятся в таблице `table_mapping`
 
-## Генератор пропертей для регистрации нового коннектора
-
-- еще не доработанное АПИ, созает `source-postgres-connector.json` файл, который нужен для регистрации коннектора
-
-```bash
-curl --location 'http://localhost:8081/connector/configs/generate/source?tableMappingId=1'
-```
-
-```json
-{
-  "name":"postgresql-connector-1",
-  "config": {
-    "connector.class":"io.debezium.connector.postgresql.PostgresConnector",
-    "tasks.max":"1",
-    "database.hostname":"localhost",
-    "database.port":"5432",
-    "database.user":"user1",
-    "database.password":"user1pwd",
-    "database.dbname":"source_db",
-    "topic.prefix":"public.books",
-    "schema.include.list":"public",
-    "table.include.list":"public.books",
-    "column.include.list":"public.books.author,public.books.id,public.books.title",
-    "plugin.name":"pgoutput",
-    "transforms":"unwrap",
-    "transforms.unwrap.type":"io.debezium.transforms.ExtractNewRecordState",
-    "key.converter":"org.apache.kafka.connect.json.JsonConverter",
-    "value.converter":"org.apache.kafka.connect.json.JsonConverter",
-    "key.converter.schemas.enable":"true",
-    "value.converter.schemas.enable":"true"
-  }
-}
-```
 # 4. Регистрация коннекторов 
 
 
