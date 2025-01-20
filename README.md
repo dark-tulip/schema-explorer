@@ -103,7 +103,7 @@ curl --location 'http://localhost:8081/datasource/connection/add' \
 - `transformations` - еще не готово. Применяемые преобразования на лету.
 
 ```bash
-curl --location 'http://localhost:8081/datasource/connection/validate/schema-mapping' \
+curl --location 'http://localhost:8081/datasource/connection/register/table-mapping' \
 --header 'Content-Type: application/json' \
 --data '{
   "sourceDbConnectionId": 1,

@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DatasourceConnectionValidateSchemaMappingRequest {
+public class DatasourceConnectionRegisterSchemaMappingRequest {
 
   @NotNull(message = "sinkDbConnectionId cannot be null")
   private Long sinkDbConnectionId;
