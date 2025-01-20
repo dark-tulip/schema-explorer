@@ -38,11 +38,11 @@ response:
     "datasourceType": null
 }
 ```
-- response вернет `{source,sink}DbConnectionId` который можно использовать при маппинге полей с одной БД в другую
-- Пункт 2. Не забудьте зарегистрировать sinkDbConnectionId
+- в других АПИ используем этот id (aka datasourceConnectionId) чтобы получить информацию о списке таблиц
+- `{source,sink}DbConnectionId` при маппинге полей с одной БД в другую берутся отсюда
+- Пункт 2. Не забудьте зарегистрировать sinkDbConnectionId 
 
-
-## 2. Получить схему данных по источнику данных
+## 2. Получить список таблиц по connectionId
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/metadata/info?datasourceConnectionId=1'
 ```
