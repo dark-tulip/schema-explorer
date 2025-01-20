@@ -8,8 +8,8 @@ import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.enums.DataSource;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
-import ru.anvera.models.request.DatasourceConnectionValidateSchemaMappingRequest;
-import ru.anvera.models.request.SchemaMetadataInfoRequest;
+import ru.anvera.models.request.DatasourceConnectionRegisterSchemaMappingRequest;
+import ru.anvera.models.request.ValidateConnectionAndGetInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
 import ru.anvera.models.response.DatasourceMetadataInfoResponse;
 import ru.anvera.repos.DatasourceConnectionRepository;
@@ -39,8 +39,8 @@ public class DatasourceConnectionService {
 
   public DatasourceConnection add(DatasourceConnectionAddRequest request) {
     // check connection creds
-    datasourceMetadataService.connectAndGetMetadataInfo(
-        new SchemaMetadataInfoRequest(
+    datasourceMetadataService.validateConnectionAndGetInfo(
+        new ValidateConnectionAndGetInfoRequest(
             request.getDbType(),
             request.getUrl(),
             request.getUsername(),
@@ -75,7 +75,7 @@ public class DatasourceConnectionService {
    * есть еще sink datasource
    * из source мы выбираем схему и таблицу (и выборочно названия столбцов которые хотим перенести) в sink datasource,
    */
-  public TableMapping validateSchemaMapping(DatasourceConnectionValidateSchemaMappingRequest request) {
+  public TableMapping registerTableMapping(DatasourceConnectionRegisterSchemaMappingRequest request) {
     // ****** source metadata ******
     validateSchemaMetadataForExistence(
         request.getSourceDbConnectionId(),
@@ -128,13 +128,7 @@ public class DatasourceConnectionService {
                                                   String tableName,
                                                   List<String> requestColumnNamesForMapping,
                                                   DataSource dataSourceType) {
-    DatasourceConnection dbConnection = datasourceConnectionRepository.getById(datasourceConnectionId);
-    DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService.connectAndGetMetadataInfo(new SchemaMetadataInfoRequest(
-        dbConnection.getDbType(),
-        dbConnection.getUrl(),
-        dbConnection.getUsername(),
-        dbConnection.getPassword()
-    ));
+    DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService.getInfo(datasourceConnectionId);
 
     // схемы
     HashMap<String, List<ColumnMetadataResponse>> schemaMetadata = dbMetadataInfoResponse.getSchemaNameAndTables().get(schemaName);
@@ -155,7 +149,7 @@ public class DatasourceConnectionService {
     // все запрашиваемые столбцы должны быть в схеме данных
     for (String columnName : requestColumnNamesForMapping) {
       if (!tableColumnNames.contains(columnName)) {
-        throw new RuntimeException("Нет такого столбца " + columnName + " в " + dataSourceType + "  БД и таблице: " + tableName + " dbConnection: " + dbConnection);
+        throw new RuntimeException("Нет такого столбца " + columnName + " в " + dataSourceType + "  БД и таблице: " + tableName + " dbConnection: " + datasourceConnectionId);
       }
     }
   }

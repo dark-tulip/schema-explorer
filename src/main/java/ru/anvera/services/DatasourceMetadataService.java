@@ -1,12 +1,15 @@
 package ru.anvera.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.anvera.factory.JdbcTemplateFactory;
-import ru.anvera.models.request.SchemaMetadataInfoRequest;
+import ru.anvera.models.entity.DatasourceConnection;
+import ru.anvera.models.request.ValidateConnectionAndGetInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
 import ru.anvera.models.response.DatasourceMetadataInfoResponse;
+import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.PostgresDatabaseMetadataRepository;
 
 import java.util.HashMap;
@@ -14,16 +17,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DatasourceMetadataService {
 
-  private final JdbcTemplateFactory jdbcTemplateFactory;
+  private final JdbcTemplateFactory            jdbcTemplateFactory;
+  private final DatasourceConnectionRepository datasourceConnectionRepository;
 
-  public DatasourceMetadataInfoResponse connectAndGetMetadataInfo(SchemaMetadataInfoRequest request) {
+  public DatasourceMetadataInfoResponse validateConnectionAndGetInfo(ValidateConnectionAndGetInfoRequest request) {
     // create new template
     JdbcTemplate jdbcTemplate = jdbcTemplateFactory
-        .createJdbcTemplate(request.getDbType(),
+        .createJdbcTemplate(
+            request.getDbType(),
             request.getUrl(),
             request.getUsername(),
             request.getPassword()
@@ -59,7 +65,21 @@ public class DatasourceMetadataService {
       schemaNameAndTables.put(schemaName, tables);
     }
 
+    log.info("63GAN469 :: connection validated for datasource: {}", new DatasourceMetadataInfoResponse(schemaNameAndTables));
+
     return new DatasourceMetadataInfoResponse(schemaNameAndTables);
+  }
+
+
+  public DatasourceMetadataInfoResponse getInfo(Long connectionId) {
+    DatasourceConnection connection = datasourceConnectionRepository.getById(connectionId);
+
+    return validateConnectionAndGetInfo(new ValidateConnectionAndGetInfoRequest(
+        connection.getDbType(),
+        connection.getUrl(),
+        connection.getUsername(),
+        connection.getPassword()
+    ));
   }
 
   private boolean skipInternalSchema(String schemaName) {

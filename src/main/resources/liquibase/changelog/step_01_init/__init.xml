@@ -45,4 +45,10 @@
         </sql>
     </changeSet>
 
+    <changeSet id="4-Q2ZYOR2L" author="ttelbayeva">
+        <sql>
+            alter table datasource_connections add unique (url);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

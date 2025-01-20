@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SchemaMetadataInfoRequest {
+public class ValidateConnectionAndGetInfoRequest {
 
   @NotNull(message = "dbType cannot be null")
   private String dbType;
