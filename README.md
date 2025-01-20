@@ -13,16 +13,38 @@ docker compose up
 
 # 2. Schema explorer REST API
 
-## 1. Получить схему данных по источнику данных
+## 1. Зарегистрировать connection string к базе данных (сохранить у себя логин и пароль для подключения к БД)
+- Пункт 1. SourceDbConnectionId
 ```bash
-curl --location 'http://localhost:8081/datasource/metadata/info' \
+curl --location 'http://localhost:8081/datasource/connection/add' \
 --header 'Content-Type: application/json' \
 --data '{
     "dbType": "postgresql",
     "url": "jdbc:postgresql://localhost:5432/source_db",
     "username": "user1",
-    "password": "user1pwd"
+    "password": "user1pwd",
+    "isActive": "true"
 }'
+```
+response:
+```json
+{
+    "id": 1,
+    "dbType": "postgresql",
+    "url": "jdbc:postgresql://localhost:5432/source_db",
+    "username": "user1",
+    "password": "user1pwd",
+    "isActive": true,
+    "datasourceType": null
+}
+```
+- response вернет `{source,sink}DbConnectionId` который можно использовать при маппинге полей с одной БД в другую
+- Пункт 2. Не забудьте зарегистрировать sinkDbConnectionId
+
+
+## 2. Получить схему данных по источнику данных
+```bash
+curl --location 'http://localhost:8081/datasource/connection/metadata/info?datasourceConnectionId=1'
 ```
 response: 
 ```json
@@ -53,34 +75,6 @@ response:
     }
 }
 ```
-
-## 2. Зарегистрировать connection string к базе данных
-- Пункт 1. SourceDbConnectionId
-```bash
-curl --location 'http://localhost:8081/datasource/connection/add' \
---header 'Content-Type: application/json' \
---data '{
-    "dbType": "postgresql",
-    "url": "jdbc:postgresql://localhost:5432/source_db",
-    "username": "user1",
-    "password": "user1pwd",
-    "isActive": "true"
-}'
-```
-response:
-```json
-{
-    "id": 1,
-    "dbType": "postgresql",
-    "url": "jdbc:postgresql://localhost:5432/source_db",
-    "username": "user1",
-    "password": "user1pwd",
-    "isActive": true,
-    "datasourceType": null
-}
-```
-- response вернет `{source,sink}DbConnectionId` который можно использовать при маппинге полей с одной БД в другую
-- Пункт 2. Не забудьте зарегистрировать sinkDbConnectionId
 
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/add' \
