@@ -1,8 +1,6 @@
 package ru.anvera.models.enums;
 
-/**
- * Source - стро
- */
+
 public enum DataSource {
   SOURCE("source"),
   SINK("sink");
@@ -12,5 +10,4 @@ public enum DataSource {
   DataSource(String name) {
     this.name = name;
   }
-
 }

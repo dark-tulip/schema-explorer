@@ -45,14 +45,14 @@ public class TableMappingRepository {
 
   public Long insert(TableMapping mapping) {
     String sql = "INSERT INTO table_mapping (" +
-        "source_db_connection_id, " +
-        "sink_db_connection_id, " +
-        "source_schema_name, " +
-        "sink_schema_name, " +
-        "source_table, " +
-        "sink_table, " +
-        "source_to_sink_column_mapping, " +
-        "transformations) " +
+        " source_db_connection_id, " +
+        " sink_db_connection_id, " +
+        " source_schema_name, " +
+        " sink_schema_name, " +
+        " source_table, " +
+        " sink_table, " +
+        " source_to_sink_column_mapping, " +
+        " transformations) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) RETURNING id";
 
     return jdbcTemplate.queryForObject(sql, new Object[]{
@@ -69,12 +69,12 @@ public class TableMappingRepository {
 
   public int update(TableMapping mapping) {
     String sql = "UPDATE table_mapping SET " +
-        "source_schema_name = ?, " +
-        "sink_schema_name = ?, " +
-        "source_table = ?, " +
-        "sink_table = ?, " +
-        "source_to_sink_column_mapping = ?, " +
-        "transformations = ? " +
+        " source_schema_name = ?, " +
+        " sink_schema_name = ?, " +
+        " source_table = ?, " +
+        " sink_table = ?, " +
+        " source_to_sink_column_mapping = ?, " +
+        " transformations = ? " +
         "WHERE id = ?";
 
     return jdbcTemplate.update(sql,
@@ -89,7 +89,8 @@ public class TableMappingRepository {
   }
 
   public int deleteById(Long id) {
-    String sql = "DELETE FROM table_mapping WHERE id = ?";
+    String sql = "DELETE FROM table_mapping " +
+        " WHERE id = ?";
     return jdbcTemplate.update(sql, id);
   }
 

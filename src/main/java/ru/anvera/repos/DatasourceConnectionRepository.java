@@ -61,8 +61,15 @@ public class DatasourceConnectionRepository {
   }
 
   public int update(DatasourceConnection connection) {
-    String sql = "UPDATE datasource_connections SET db_type = ?, url = ?, username = ?, password = ?, is_active = ?, datasource_type = ? " +
-        "WHERE id = ?";
+    String sql = "UPDATE datasource_connections " +
+            " SET " +
+            " db_type = ?, " +
+            " url = ?, " +
+            " username = ?, " +
+            " password = ?, " +
+            " is_active = ?, " +
+            " datasource_type = ? " +
+        " WHERE id = ?";
     return jdbcTemplate.update(sql, connection.getDbType(), connection.getUrl(), connection.getUsername(),
         connection.getPassword(), connection.getIsActive(), connection.getDatasourceType(), connection.getId());
   }

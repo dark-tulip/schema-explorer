@@ -16,7 +16,7 @@ public class ConnectorRegistrationService {
   private static final String KAFKA_CONNECT_URL = "http://localhost:8083/connectors/";
 
   private final SourceConnectorConfigGenerator sourceConnectorConfigGenerator;
-  private final SinkConnectorConfigGenerator   sinkConnectorConfigGenerator;
+  private final SinkConnectorConfigGenerator sinkConnectorConfigGenerator;
 
   public void registerConnector(Long tableMappingId, String connectorType) throws Exception {
     String jsonPayload;
@@ -30,7 +30,7 @@ public class ConnectorRegistrationService {
     log.info("L3C4WMNP :: " + jsonPayload);
 
     // Настройка соединения
-    URL               url        = new URL(KAFKA_CONNECT_URL);
+    URL url = new URL(KAFKA_CONNECT_URL);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setDoOutput(true);
     connection.setRequestMethod("POST");
