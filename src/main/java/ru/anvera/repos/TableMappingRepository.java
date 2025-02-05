@@ -1,46 +1,32 @@
 package ru.anvera.repos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.anvera.models.entity.TableMapping;
+import ru.anvera.models.rowmappers.TableMappingRowMapper;
 
-import java.util.HashMap;
+import java.util.List;
 
 @Repository
 public class TableMappingRepository {
 
   private final JdbcTemplate jdbcTemplate;
 
-  private final Gson gson = new Gson();
-
   public TableMappingRepository(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  private final RowMapper<TableMapping> rowMapper = (rs, rowNum) -> {
-    // Deserialize JSON to HashMap for column mapping
-    String sourceToSinkJson    = rs.getString("source_to_sink_column_mapping");
-    String transformationsJson = rs.getString("transformations");
-
-    return new TableMapping(
-        rs.getLong("id"),
-        rs.getLong("source_db_connection_id"),
-        rs.getLong("sink_db_connection_id"),
-        rs.getString("source_schema_name"),
-        rs.getString("sink_schema_name"),
-        rs.getString("source_table"),
-        rs.getString("sink_table"),
-        parseJsonToHashMap(sourceToSinkJson),
-        parseJsonToHashMap(transformationsJson));
-  };
-
   public TableMapping getById(Long id) {
-    String sql = "SELECT * FROM table_mapping WHERE id = ?";
-    return jdbcTemplate.queryForObject(sql, rowMapper, id);
+    String sql = "SELECT * " +
+        " FROM table_mapping " +
+        " WHERE id = ?";
+    return jdbcTemplate.queryForObject(sql, new TableMappingRowMapper(), id);
+  }
+
+  public List<TableMapping> getAll() {
+    String sql = "SELECT * FROM table_mapping ";
+    return jdbcTemplate.query(sql, new TableMappingRowMapper());
   }
 
   public Long insert(TableMapping mapping) {
@@ -102,10 +88,4 @@ public class TableMappingRepository {
     }
   }
 
-  private HashMap<String, String> parseJsonToHashMap(String json) {
-    return json != null
-        ? gson.fromJson(json, new TypeToken<HashMap<String, String>>() {
-    }.getType())
-        : null;
-  }
 }
