@@ -14,6 +14,13 @@ ALTER DATABASE sink_db OWNER TO user2;
 GRANT ALL PRIVILEGES ON DATABASE sink_db TO user2;
 ALTER USER user2 WITH SUPERUSER;
 
+-- 2. Keycloak database (тестовый пример источника БД куда кладут данные)
+CREATE DATABASE keycloakdb;
+CREATE USER keycloakuser WITH PASSWORD 'keycloakpass';
+ALTER DATABASE keycloakdb OWNER TO keycloakuser;
+GRANT ALL PRIVILEGES ON DATABASE keycloakdb TO keycloakuser;
+ALTER USER keycloakuser WITH SUPERUSER;
+
 -- =========================== 1.1 Подключение к source_db ===============================
 \c source_db user1
 

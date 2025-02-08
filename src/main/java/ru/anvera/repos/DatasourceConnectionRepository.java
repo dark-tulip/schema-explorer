@@ -44,7 +44,12 @@ public class DatasourceConnectionRepository {
 
   public Long save(DatasourceConnection connection) {
     String sql = "INSERT INTO datasource_connections " +
-        "(db_type, url, username, password, is_active, datasource_type) " +
+        "(db_type, " +
+        " url, " +
+        " username, " +
+        " password, " +
+        " is_active, " +
+        " datasource_type) " +
         "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
     return jdbcTemplate.queryForObject(
         sql,
@@ -70,12 +75,20 @@ public class DatasourceConnectionRepository {
             " is_active = ?, " +
             " datasource_type = ? " +
         " WHERE id = ?";
-    return jdbcTemplate.update(sql, connection.getDbType(), connection.getUrl(), connection.getUsername(),
-        connection.getPassword(), connection.getIsActive(), connection.getDatasourceType(), connection.getId());
+    return jdbcTemplate.update(sql,
+        connection.getDbType(),
+        connection.getUrl(),
+        connection.getUsername(),
+        connection.getPassword(),
+        connection.getIsActive(),
+        connection.getDatasourceType(),
+        connection.getId()
+    );
   }
 
   public int deleteById(Long id) {
-    String sql = "DELETE FROM datasource_connections WHERE id = ?";
+    String sql = "DELETE FROM datasource_connections " +
+        " WHERE id = ?";
     return jdbcTemplate.update(sql, id);
   }
 }

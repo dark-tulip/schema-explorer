@@ -25,7 +25,8 @@ public class TableMappingRepository {
   }
 
   public List<TableMapping> getAll() {
-    String sql = "SELECT * FROM table_mapping ";
+    String sql = "SELECT * " +
+        " FROM table_mapping ";
     return jdbcTemplate.query(sql, new TableMappingRowMapper());
   }
 
@@ -39,7 +40,8 @@ public class TableMappingRepository {
         " sink_table, " +
         " source_to_sink_column_mapping, " +
         " transformations) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) RETURNING id";
+        " VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) " +
+        " RETURNING id";
 
     return jdbcTemplate.queryForObject(sql, new Object[]{
         mapping.getSourceDbConnectionId(),
@@ -61,7 +63,7 @@ public class TableMappingRepository {
         " sink_table = ?, " +
         " source_to_sink_column_mapping = ?, " +
         " transformations = ? " +
-        "WHERE id = ?";
+        " WHERE id = ?";
 
     return jdbcTemplate.update(sql,
         mapping.getSourceSchemaName(),

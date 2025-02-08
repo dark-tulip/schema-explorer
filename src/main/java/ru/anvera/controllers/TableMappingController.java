@@ -25,4 +25,5 @@ public class TableMappingController {
   public TableMappingInfoGetResponse getInfo(Long tableMappingId) {
     return tableMappingService.getInfo(tableMappingId);
   }
+
 }
