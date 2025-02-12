@@ -42,6 +42,8 @@ response:
 - `{source,sink}DbConnectionId` при маппинге полей с одной БД в другую берутся отсюда
 - Пункт 2. Не забудьте зарегистрировать sinkDbConnectionId 
 
+![img.png](img.png)
+
 ## 2. Получить список таблиц по connectionId
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/metadata/info?datasourceConnectionId=1'
@@ -133,8 +135,11 @@ resposne:
 
 Данные о сопоставленных полях хранятся в таблице `table_mapping`
 
+![img_1.png](img_1.png)
+
 # 4. Регистрация коннекторов 
 
+![img_2.png](img_2.png)
 
 ### 4.1 Для регистрации Source коннектора:
 
@@ -146,4 +151,32 @@ curl --location --request POST 'http://localhost:8081/connectors/register/source
 
 ```bash
 curl --location --request POST 'http://localhost:8081/connectors/register/sink?tableMappingId=1'
+```
+
+# Авторизация на проекте
+
+```bash
+curl --location 'http://localhost:7080/realms/amvera/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=cdc-client1' \
+--data-urlencode 'client_secret=2DdrcgHnkcruLsUTo2ltNzm1iu5nddR7' \
+--data-urlencode 'username=cdc-user1' \
+--data-urlencode 'password=user1pass' \
+--data-urlencode 'grant_type=password'
+```
+
+
+response
+
+```json
+{
+    "access_token": "..",
+    "expires_in": 300,
+    "refresh_expires_in": 1800,
+    "refresh_token": "..",
+    "token_type": "Bearer",
+    "not-before-policy": 0,
+    "session_state": "8f0e9e3b-d3d4-499d-a5b1-a5b1587a075a",
+    "scope": "email profile"
+}
 ```
