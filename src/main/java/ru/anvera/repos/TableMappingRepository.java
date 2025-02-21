@@ -19,28 +19,30 @@ public class TableMappingRepository {
 
   public TableMapping getById(Long id) {
     String sql = "SELECT * " +
-        " FROM table_mapping " +
+        " FROM table_mappings " +
         " WHERE id = ?";
     return jdbcTemplate.queryForObject(sql, new TableMappingRowMapper(), id);
   }
 
-  public List<TableMapping> getAll() {
+  public List<TableMapping> getAllByProjectId(Long projectId) {
     String sql = "SELECT * " +
-        " FROM table_mapping ";
-    return jdbcTemplate.query(sql, new TableMappingRowMapper());
+        " FROM table_mappings " +
+        " where project_id = ? ";
+    return jdbcTemplate.query(sql, new TableMappingRowMapper(), projectId);
   }
 
   public Long insert(TableMapping mapping) {
-    String sql = "INSERT INTO table_mapping (" +
+    String sql = "INSERT INTO table_mappings (" +
         " source_db_connection_id, " +
         " sink_db_connection_id, " +
         " source_schema_name, " +
         " sink_schema_name, " +
         " source_table, " +
         " sink_table, " +
+        " project_id, " +
         " source_to_sink_column_mapping, " +
         " transformations) " +
-        " VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) " +
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb) " +
         " RETURNING id";
 
     return jdbcTemplate.queryForObject(sql, new Object[]{
@@ -50,17 +52,19 @@ public class TableMappingRepository {
         mapping.getSinkSchemaName(),
         mapping.getSourceTable(),
         mapping.getSinkTable(),
+        mapping.getProjectId(),
         toJson(mapping.getSourceToSinkColumnNameMapping()),
         toJson(mapping.getTransformations())
     }, Long.class);
   }
 
   public int update(TableMapping mapping) {
-    String sql = "UPDATE table_mapping SET " +
+    String sql = "UPDATE table_mappings SET " +
         " source_schema_name = ?, " +
         " sink_schema_name = ?, " +
         " source_table = ?, " +
         " sink_table = ?, " +
+        " project_id = ?, " +
         " source_to_sink_column_mapping = ?, " +
         " transformations = ? " +
         " WHERE id = ?";
@@ -70,6 +74,7 @@ public class TableMappingRepository {
         mapping.getSinkSchemaName(),
         mapping.getSourceTable(),
         mapping.getSinkTable(),
+        mapping.getProjectId(),
         toJson(mapping.getSourceToSinkColumnNameMapping()),
         toJson(mapping.getTransformations()),
         mapping.getId()
@@ -77,7 +82,7 @@ public class TableMappingRepository {
   }
 
   public int deleteById(Long id) {
-    String sql = "DELETE FROM table_mapping " +
+    String sql = "DELETE FROM table_mappings " +
         " WHERE id = ?";
     return jdbcTemplate.update(sql, id);
   }

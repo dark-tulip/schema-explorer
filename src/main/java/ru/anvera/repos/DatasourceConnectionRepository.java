@@ -29,9 +29,10 @@ public class DatasourceConnectionRepository {
       rs.getLong("project_id")
   );
 
-  public List<DatasourceConnection> findAll() {
-    String sql = "SELECT * FROM datasource_connections";
-    return jdbcTemplate.query(sql, rowMapper);
+  public List<DatasourceConnection> findAll(Long projectId) {
+    String sql = "SELECT * FROM datasource_connections " +
+        " where project_id = ?";
+    return jdbcTemplate.query(sql, rowMapper, projectId);
   }
 
   public DatasourceConnection getById(Long id, Long projectId) {

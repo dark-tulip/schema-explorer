@@ -81,4 +81,20 @@
         </sql>
     </changeSet>
 
+    <changeSet id="PJ2SAU2P" author="ttelbayeva">
+        <sql>
+            alter table table_mapping rename to table_mappings;
+        </sql>
+
+        <sql>
+            alter table table_mappings
+                add constraint fk_table_mapping_sink_db_connection_id foreign key (sink_db_connection_id)
+                    references datasource_connections (id);
+
+            alter table table_mappings
+                add constraint fk_table_mapping_source_db_connection_id foreign key (source_db_connection_id)
+                    references datasource_connections (id);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

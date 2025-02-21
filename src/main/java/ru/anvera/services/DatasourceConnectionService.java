@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.anvera.configs.CustomUserPrincipal;
+import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.enums.DataSource;
@@ -25,15 +26,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class DatasourceConnectionService {
-
   private final DatasourceConnectionRepository datasourceConnectionRepository;
   private final DatasourceMetadataService      datasourceMetadataService;
   private final TableMappingRepository         tableMappingRepository;
+  private final SecurityContextUtils           securityContextUtils;
 
-  public List<DatasourceConnection> getAllConnections() {
-    return datasourceConnectionRepository.findAll();
+  public List<DatasourceConnection> getAllConnectionsByProjectId() {
+    Long projectId = securityContextUtils.getPrincipal().getProjectId();
+    return datasourceConnectionRepository.findAll(projectId);
   }
-
 
   public DatasourceConnection add(DatasourceConnectionAddRequest request,
                                   CustomUserPrincipal principal) {
@@ -118,6 +119,7 @@ public class DatasourceConnectionService {
             request.getSinkSchemaName(),
             request.getSourceTableName(),
             request.getSinkTableName(),
+            principal.getProjectId(),
             sourceToSinkColumnNameMapping,
             request.getTransformations()
         )

@@ -18,6 +18,7 @@ public class TableMapping {
   private String sinkSchemaName;
   private String sourceTable;
   private String sinkTable;
+  private Long   projectId;
 
   /**
    * * кол-во столбцов для маппинга в source and sink должны быть равны

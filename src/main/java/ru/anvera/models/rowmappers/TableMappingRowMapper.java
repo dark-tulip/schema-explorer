@@ -22,6 +22,7 @@ public class TableMappingRowMapper extends ARowMapper implements RowMapper<Table
         rs.getString("sink_schema_name"),
         rs.getString("source_table"),
         rs.getString("sink_table"),
+        rs.getLong("project_id"),
         parseJsonToHashMap(sourceToSinkJson),
         parseJsonToHashMap(transformationsJson));
   }

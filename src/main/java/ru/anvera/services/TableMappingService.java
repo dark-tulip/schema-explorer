@@ -2,6 +2,7 @@ package ru.anvera.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.response.TableMappingAllGetResponse;
 import ru.anvera.models.response.TableMappingInfoGetResponse;
@@ -14,8 +15,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TableMappingService {
-
   private final TableMappingRepository tableMappingRepository;
+  private final SecurityContextUtils   securityContextUtils;
 
   public TableMappingInfoGetResponse getInfo(Long tableMappingId) {
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
@@ -38,7 +39,9 @@ public class TableMappingService {
   }
 
   public TableMappingAllGetResponse getAll() {
-    List<TableMapping> tableMappingList = tableMappingRepository.getAll();
+    Long projectId = securityContextUtils.getPrincipal().getProjectId();
+
+    List<TableMapping> tableMappingList = tableMappingRepository.getAllByProjectId(projectId);
 
     List<TableMappingAllGetResponse.TableMappingInfoShort> tableMappingInfoShorts = tableMappingList
         .stream()
