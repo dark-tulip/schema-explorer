@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.repos.DatasourceConnectionRepository;
@@ -19,15 +20,17 @@ public class SinkConnectorConfigGenerator {
 
   private final DatasourceConnectionRepository datasourceConnectionRepository;
   private final TableMappingRepository         tableMappingRepository;
+  private final SecurityContextUtils           securityContextUtils;
 
   public JsonObject generateSinkConnectorConfig(Long tableMappingId) {
     // todo добавь получение токена из контекста чтобы везде не пробрасывать
-    Long projectId = 1l;
+    Long projectId = securityContextUtils.getPrincipal().getProjectId();
+
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
     String       tableName    = tableMapping.getSinkTable();
     String       schemaName   = tableMapping.getSinkSchemaName();
 
-    DatasourceConnection connection       = datasourceConnectionRepository.getById(
+    DatasourceConnection connection = datasourceConnectionRepository.getById(
         tableMapping.getSinkDbConnectionId(),
         projectId
     );

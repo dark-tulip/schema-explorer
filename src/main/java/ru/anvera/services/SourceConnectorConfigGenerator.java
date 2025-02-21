@@ -20,19 +20,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SourceConnectorConfigGenerator {
-
   private final DatasourceConnectionRepository datasourceConnectionRepository;
-  private final TableMappingRepository tableMappingRepository;
-  private final SecurityContextUtils   securityContextUtils;
+  private final TableMappingRepository         tableMappingRepository;
+  private final SecurityContextUtils           securityContextUtils;
 
   private static final String DOCKER_COMPOSE_DATABASE_CONTAINER_NAME = "local_postgres";
 
   public JsonObject generateSourceConnectorConfig(Long tableMappingId) {
-
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
-    String       tableName    = tableMapping.getSourceTable();
-    String       schemaName   = tableMapping.getSourceSchemaName();
-    Set<String>  tableColumns = tableMapping.getSourceToSinkColumnNameMapping().keySet();
+
+    String      tableName    = tableMapping.getSourceTable();
+    String      schemaName   = tableMapping.getSourceSchemaName();
+    Set<String> tableColumns = tableMapping.getSourceToSinkColumnNameMapping().keySet();
 
     DatasourceConnection connection = datasourceConnectionRepository.getById(
         tableMapping.getSourceDbConnectionId(),

@@ -2,7 +2,6 @@ package ru.anvera.configs;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -16,7 +15,7 @@ public class SecurityContextUtils {
 
   private final UserService userService;
 
-  public @Nullable CustomUserPrincipal getPrincipal() {
+  public CustomUserPrincipal getPrincipal() {
     Object authentication = SecurityContextHolder.getContext().getAuthentication();
 
     // if user authorized via jwt token

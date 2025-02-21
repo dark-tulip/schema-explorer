@@ -3,6 +3,7 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.anvera.models.enums.DataSource;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -18,10 +19,10 @@ public class ConnectorRegistrationService {
   private final SourceConnectorConfigGenerator sourceConnectorConfigGenerator;
   private final SinkConnectorConfigGenerator sinkConnectorConfigGenerator;
 
-  public void registerConnector(Long tableMappingId, String connectorType) throws Exception {
+  public void registerConnector(Long tableMappingId, DataSource connectorType) throws Exception {
     String jsonPayload;
 
-    if (connectorType.equals("SINK")) {
+    if (connectorType.equals(DataSource.SINK)) {
       jsonPayload = sinkConnectorConfigGenerator.generateSinkConnectorConfig(tableMappingId).toString();
     } else {
       jsonPayload = sourceConnectorConfigGenerator.generateSourceConnectorConfig(tableMappingId).toString();
