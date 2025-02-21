@@ -51,4 +51,34 @@
         </sql>
     </changeSet>
 
+    <changeSet id="39KP6DIW" author="ttelbayeva">
+        <sql>
+            create table if not exists users
+            (
+                id           bigserial primary key,
+                username     text unique,
+                email        text unique,
+                password     text unique,
+                is_active    boolean,
+                project_id   bigint,
+                created_time timestamp default current_timestamp,
+                updated_time timestamp default current_timestamp
+            )
+        </sql>
+
+        <sql>
+            create table if not exists projects
+            (
+                id           bigserial primary key,
+                project_name text unique,
+                is_active    boolean,
+                created_time timestamp default current_timestamp,
+                updated_time timestamp default current_timestamp
+            )
+        </sql>
+        <sql>
+            alter table datasource_connections add column if not exists project_id  bigint references projects
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

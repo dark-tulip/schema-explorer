@@ -180,3 +180,47 @@ response
     "scope": "email profile"
 }
 ```
+
+payload access_token а такой
+
+```json
+{
+  "exp": 1739351294,
+  "iat": 1739350994,
+  "jti": "72347738-0a16-4bab-8221-b5e345e5b538",
+  "iss": "http://localhost:7080/realms/amvera",
+  "aud": "account",
+  "sub": "692be98c-4276-42ae-a390-23cc07be6c98",
+  "typ": "Bearer",
+  "azp": "cdc-client1",
+  "session_state": "82cef249-c270-43d2-ac26-202346e2358e",
+  "acr": "1",
+  "allowed-origins": [
+    "http://localhost:8081"
+  ],
+  "realm_access": {
+    "roles": [
+      "offline_access",
+      "default-roles-amvera",
+      "uma_authorization"
+    ]
+  },
+  "resource_access": {
+    "account": {
+      "roles": [
+        "manage-account",
+        "manage-account-links",
+        "view-profile"
+      ]
+    }
+  },
+  "scope": "email profile",
+  "sid": "82cef249-c270-43d2-ac26-202346e2358e",
+  "email_verified": true,
+  "name": "cdc user1",
+  "preferred_username": "cdc-user1",
+  "given_name": "cdc",
+  "family_name": "user1",
+  "email": "cdc-user1@gmail.com"
+}
+```

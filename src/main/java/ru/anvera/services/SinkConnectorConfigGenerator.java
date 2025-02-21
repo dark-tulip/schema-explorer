@@ -21,12 +21,21 @@ public class SinkConnectorConfigGenerator {
   private final TableMappingRepository         tableMappingRepository;
 
   public JsonObject generateSinkConnectorConfig(Long tableMappingId) {
+    // todo добавь получение токена из контекста чтобы везде не пробрасывать
+    Long projectId = 1l;
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
     String       tableName    = tableMapping.getSinkTable();
     String       schemaName   = tableMapping.getSinkSchemaName();
 
-    DatasourceConnection connection       = datasourceConnectionRepository.getById(tableMapping.getSinkDbConnectionId());
-    DatasourceConnection sourceConnection = datasourceConnectionRepository.getById(tableMapping.getSourceDbConnectionId());
+    DatasourceConnection connection       = datasourceConnectionRepository.getById(
+        tableMapping.getSinkDbConnectionId(),
+        projectId
+    );
+
+    DatasourceConnection sourceConnection = datasourceConnectionRepository.getById(
+        tableMapping.getSourceDbConnectionId(),
+        projectId
+    );
 
     String dbType    = connection.getDbType();
     String url       = connection.getUrl();

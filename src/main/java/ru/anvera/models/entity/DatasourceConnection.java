@@ -16,4 +16,5 @@ public class DatasourceConnection {
   private String  password;
   private Boolean isActive;
   private String  datasourceType;
+  private Long  projectId;
 }

@@ -71,8 +71,8 @@ public class DatasourceMetadataService {
   }
 
 
-  public DatasourceMetadataInfoResponse getInfo(Long connectionId) {
-    DatasourceConnection connection = datasourceConnectionRepository.getById(connectionId);
+  public DatasourceMetadataInfoResponse getInfo(Long connectionId, Long projectId) {
+    DatasourceConnection connection = datasourceConnectionRepository.getById(connectionId, projectId);
 
     return validateConnectionAndGetInfo(new ValidateConnectionAndGetInfoRequest(
         connection.getDbType(),

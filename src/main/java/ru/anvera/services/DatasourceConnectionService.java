@@ -4,6 +4,7 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.anvera.configs.CustomUserPrincipal;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.enums.DataSource;
@@ -33,11 +34,9 @@ public class DatasourceConnectionService {
     return datasourceConnectionRepository.findAll();
   }
 
-  public DatasourceConnection getConnectionById(Long id) {
-    return datasourceConnectionRepository.getById(id);
-  }
 
-  public DatasourceConnection add(DatasourceConnectionAddRequest request) {
+  public DatasourceConnection add(DatasourceConnectionAddRequest request,
+                                  CustomUserPrincipal principal) {
     // check connection creds
     datasourceMetadataService.validateConnectionAndGetInfo(
         new ValidateConnectionAndGetInfoRequest(
@@ -56,10 +55,11 @@ public class DatasourceConnectionService {
         request.getUsername(),
         request.getPassword(),
         request.getIsActive(),
-        request.getDatasourceType()
+        request.getDatasourceType(),
+        principal.getProjectId()
     ));
 
-    return datasourceConnectionRepository.getById(id);
+    return datasourceConnectionRepository.getById(id, principal.getProjectId());
   }
 
   public void updateConnection(DatasourceConnection connection) {
@@ -75,14 +75,16 @@ public class DatasourceConnectionService {
    * есть еще sink datasource
    * из source мы выбираем схему и таблицу (и выборочно названия столбцов которые хотим перенести) в sink datasource,
    */
-  public TableMapping registerTableMapping(DatasourceConnectionRegisterSchemaMappingRequest request) {
+  public TableMapping registerTableMapping(DatasourceConnectionRegisterSchemaMappingRequest request,
+                                           CustomUserPrincipal principal) {
     // ****** source metadata ******
     validateSchemaMetadataForExistence(
         request.getSourceDbConnectionId(),
         request.getSourceSchemaName(),
         request.getSourceTableName(),
         request.getSourceColumnsList(),
-        DataSource.SOURCE
+        DataSource.SOURCE,
+        principal.getProjectId()
     );
 
     // ****** sink metadata ******
@@ -91,7 +93,8 @@ public class DatasourceConnectionService {
         request.getSinkSchemaName(),
         request.getSinkTableName(),
         request.getSinkColumnsList(),
-        DataSource.SINK
+        DataSource.SINK,
+        principal.getProjectId()
     );
 
     if (request.getSinkColumnsList().size() != request.getSourceColumnsList().size()) {
@@ -127,8 +130,10 @@ public class DatasourceConnectionService {
                                                   String schemaName,
                                                   String tableName,
                                                   List<String> requestColumnNamesForMapping,
-                                                  DataSource dataSourceType) {
-    DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService.getInfo(datasourceConnectionId);
+                                                  DataSource dataSourceType,
+                                                  Long projectId) {
+    DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService
+        .getInfo(datasourceConnectionId, projectId);
 
     // схемы
     HashMap<String, List<ColumnMetadataResponse>> schemaMetadata = dbMetadataInfoResponse.getSchemaNameAndTables().get(schemaName);

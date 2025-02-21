@@ -24,6 +24,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.3'
 
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.keycloak:keycloak-spring-boot-starter:22.0.5' // Latest version
+
     // PostgreSQL JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'

@@ -25,7 +25,8 @@ public class DatasourceConnectionRepository {
       rs.getString("username"),
       rs.getString("password"),
       rs.getBoolean("is_active"),
-      rs.getString("datasource_type")
+      rs.getString("datasource_type"),
+      rs.getLong("project_id")
   );
 
   public List<DatasourceConnection> findAll() {
@@ -33,10 +34,10 @@ public class DatasourceConnectionRepository {
     return jdbcTemplate.query(sql, rowMapper);
   }
 
-  public DatasourceConnection getById(Long id) {
-    String sql = "SELECT * FROM datasource_connections WHERE id = ?";
+  public DatasourceConnection getById(Long id, Long projectId) {
+    String sql = "SELECT * FROM datasource_connections WHERE id = ? and project_id = ?";
     try {
-      return jdbcTemplate.queryForObject(sql, rowMapper, id);
+      return jdbcTemplate.queryForObject(sql, rowMapper, id, projectId);
     } catch (EmptyResultDataAccessException e) {
       throw new RuntimeException("R4Z24WXI :: Not found by id: " + id);
     }
@@ -48,9 +49,10 @@ public class DatasourceConnectionRepository {
         " url, " +
         " username, " +
         " password, " +
+        " project_id, " +
         " is_active, " +
         " datasource_type) " +
-        "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+        "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
     return jdbcTemplate.queryForObject(
         sql,
         new Object[]{
@@ -58,6 +60,7 @@ public class DatasourceConnectionRepository {
             connection.getUrl(),
             connection.getUsername(),
             connection.getPassword(),
+            connection.getProjectId(),
             connection.getIsActive(),
             connection.getDatasourceType()
         },
@@ -73,6 +76,7 @@ public class DatasourceConnectionRepository {
             " username = ?, " +
             " password = ?, " +
             " is_active = ?, " +
+            " project_id = ?, " +
             " datasource_type = ? " +
         " WHERE id = ?";
     return jdbcTemplate.update(sql,
@@ -81,6 +85,7 @@ public class DatasourceConnectionRepository {
         connection.getUsername(),
         connection.getPassword(),
         connection.getIsActive(),
+        connection.getProjectId(),
         connection.getDatasourceType(),
         connection.getId()
     );

@@ -1,12 +1,15 @@
 package ru.anvera.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.anvera.models.enums.DataSource;
 import ru.anvera.services.ConnectorRegistrationService;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/connectors/register")
