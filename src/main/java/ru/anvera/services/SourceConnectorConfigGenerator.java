@@ -63,7 +63,7 @@ public class SourceConnectorConfigGenerator {
     JsonObject configDetails = new JsonObject();
     configDetails.addProperty("connector.class", ConnectorDrivers.DEBEZIUM_TO_POSTGRES.getDriverName());
     configDetails.addProperty("tasks.max", "1");
-    // пока тестим через докеоркомпозер
+    // todo WARN!! пока тестим через докеоркомпозер
     configDetails.addProperty("database.hostname", extractHostname(url).replaceAll("localhost", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME));
     configDetails.addProperty("database.port", extractPort(url));
     configDetails.addProperty("database.user", username);
