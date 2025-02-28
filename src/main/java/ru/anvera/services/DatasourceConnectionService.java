@@ -8,7 +8,7 @@ import ru.anvera.configs.CustomUserPrincipal;
 import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
-import ru.anvera.models.enums.DataSource;
+import ru.anvera.models.enums.DataSourceType;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionRegisterSchemaMappingRequest;
 import ru.anvera.models.request.ValidateConnectionAndGetInfoRequest;
@@ -72,7 +72,7 @@ public class DatasourceConnectionService {
   }
 
   /**
-   * есть source datasource
+   * Есть source datasource
    * есть еще sink datasource
    * из source мы выбираем схему и таблицу (и выборочно названия столбцов которые хотим перенести) в sink datasource,
    */
@@ -84,7 +84,7 @@ public class DatasourceConnectionService {
         request.getSourceSchemaName(),
         request.getSourceTableName(),
         request.getSourceColumnsList(),
-        DataSource.SOURCE,
+        DataSourceType.SOURCE,
         principal.getProjectId()
     );
 
@@ -94,12 +94,12 @@ public class DatasourceConnectionService {
         request.getSinkSchemaName(),
         request.getSinkTableName(),
         request.getSinkColumnsList(),
-        DataSource.SINK,
+        DataSourceType.SINK,
         principal.getProjectId()
     );
 
     if (request.getSinkColumnsList().size() != request.getSourceColumnsList().size()) {
-      throw new RuntimeException("Колво столбцов для маппинга source: " + request.getSourceColumnsList() + " и sink " + request.getSinkColumnsList() + " таблицы должны быть равны");
+      throw new RuntimeException("Кол-во столбцов для маппинга source: " + request.getSourceColumnsList() + " и sink " + request.getSinkColumnsList() + " таблицы должны быть равны");
     }
 
     // сопоставить столбцы из source в sink таблицу
@@ -132,7 +132,7 @@ public class DatasourceConnectionService {
                                                   String schemaName,
                                                   String tableName,
                                                   List<String> requestColumnNamesForMapping,
-                                                  DataSource dataSourceType,
+                                                  DataSourceType dataSourceType,
                                                   Long projectId) {
     DatasourceMetadataInfoResponse dbMetadataInfoResponse = datasourceMetadataService
         .getInfo(datasourceConnectionId, projectId);

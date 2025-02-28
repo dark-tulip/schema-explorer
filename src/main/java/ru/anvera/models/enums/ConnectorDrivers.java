@@ -18,12 +18,13 @@ public enum ConnectorDrivers {
    * Типы данных:	Фильтруются на уровне SQL-запроса.	Все данные из таблицы.
    * Сценарии использования:	Одноразовый экспорт, редкие обновления.	Постоянная синхронизация данных.
    */
-  DEBEZIUM_TO_POSTGRES("io.debezium.connector.postgresql.PostgresConnector", DataSource.SOURCE);
+  DEBEZIUM_TO_POSTGRES("io.debezium.connector.postgresql.PostgresConnector", DataSourceType.SOURCE),
+  KAFKA_TO_CLICKHOUSE("com.clickhouse.kafka.connect.sink.ClickHouseSinkConnector", DataSourceType.SINK);
 
-  final String     driverName;
-  final DataSource connectorType;
+  final String         driverName;
+  final DataSourceType connectorType;
 
-  ConnectorDrivers(String driverName, DataSource connectorType) {
+  ConnectorDrivers(String driverName, DataSourceType connectorType) {
     this.driverName    = driverName;
     this.connectorType = connectorType;
   }

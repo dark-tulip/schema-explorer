@@ -3,55 +3,31 @@ package ru.anvera.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.anvera.models.enums.DataSource;
-
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import ru.anvera.models.enums.DataSourceType;
+import ru.anvera.models.enums.DbType;
+import ru.anvera.services.connectors.ClickHouseRegistrationService;
+import ru.anvera.services.connectors.PostgresRegistrationService;
 
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConnectorRegistrationService {
-  private static final String KAFKA_CONNECT_URL = "http://localhost:8083/connectors/";
 
-  private final SourceConnectorConfigGenerator sourceConnectorConfigGenerator;
-  private final SinkConnectorConfigGenerator sinkConnectorConfigGenerator;
+  private final ClickHouseRegistrationService clickHouseRegistrationService;
+  private final PostgresRegistrationService   postgresRegistrationService;
 
-  public void registerConnector(Long tableMappingId, DataSource connectorType) throws Exception {
-    String jsonPayload;
+  public void registerConnector(Long tableMappingId, DataSourceType dataSourceType, String dbTypeString) {
+    DbType dbType = DbType.valueOf(dbTypeString);
 
-    if (connectorType.equals(DataSource.SINK)) {
-      jsonPayload = sinkConnectorConfigGenerator.generateSinkConnectorConfig(tableMappingId).toString();
-    } else {
-      jsonPayload = sourceConnectorConfigGenerator.generateSourceConnectorConfig(tableMappingId).toString();
+    if (DbType.POSTGRES.equals(dbType)) {
+      postgresRegistrationService.register(tableMappingId, dataSourceType);
     }
 
-    log.info("L3C4WMNP :: " + jsonPayload);
-
-    // Настройка соединения
-    URL url = new URL(KAFKA_CONNECT_URL);
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setDoOutput(true);
-    connection.setRequestMethod("POST");
-    connection.setRequestProperty("Accept", "application/json");
-    connection.setRequestProperty("Content-Type", "application/json");
-
-    // call
-    try (OutputStream os = connection.getOutputStream()) {
-      os.write(jsonPayload.getBytes());
-      os.flush();
-
-      StringBuilder response = new StringBuilder();
-      try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(connection.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          response.append(line);
-        }
-      }
-      log.info("V62NH6IY :: response of connector registration: " + response);
-      connection.disconnect();
+    if (DbType.CLICKHOUSE.equals(dbType)) {
+      clickHouseRegistrationService.register(tableMappingId, dataSourceType);
     }
+
   }
+
 }

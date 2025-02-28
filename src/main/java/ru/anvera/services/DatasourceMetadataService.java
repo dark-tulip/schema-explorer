@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.anvera.factory.JdbcTemplateFactory;
+import ru.anvera.factory.DynamicJdbcTemplateFactory;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.request.ValidateConnectionAndGetInfoRequest;
 import ru.anvera.models.response.ColumnMetadataResponse;
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DatasourceMetadataService {
 
-  private final JdbcTemplateFactory            jdbcTemplateFactory;
+  private final DynamicJdbcTemplateFactory     dynamicJdbcTemplateFactory;
   private final DatasourceConnectionRepository datasourceConnectionRepository;
 
   public DatasourceMetadataInfoResponse validateConnectionAndGetInfo(ValidateConnectionAndGetInfoRequest request) {
     // create new template
-    JdbcTemplate jdbcTemplate = jdbcTemplateFactory
+    JdbcTemplate jdbcTemplate = dynamicJdbcTemplateFactory
         .createJdbcTemplate(
             request.getDbType(),
             request.getUrl(),

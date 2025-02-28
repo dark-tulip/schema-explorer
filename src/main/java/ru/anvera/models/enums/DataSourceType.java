@@ -1,13 +1,13 @@
 package ru.anvera.models.enums;
 
 
-public enum DataSource {
+public enum DataSourceType {
   SOURCE("source"),
   SINK("sink");
 
   final String name;
 
-  DataSource(String name) {
+  DataSourceType(String name) {
     this.name = name;
   }
 }

@@ -7,7 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.anvera.configs.CustomUserPrincipal;
-import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
@@ -26,8 +25,7 @@ import java.util.List;
 public class DatasourceConnectionController {
 
   private final DatasourceConnectionService datasourceConnectionService;
-  private final DatasourceMetadataService datasourceMetadataService;
-  private final SecurityContextUtils      securityContextUtils;
+  private final DatasourceMetadataService   datasourceMetadataService;
 
   @PostMapping("/add")
   public DatasourceConnection addPost(

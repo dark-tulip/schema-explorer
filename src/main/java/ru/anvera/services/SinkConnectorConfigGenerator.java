@@ -10,6 +10,9 @@ import ru.anvera.models.entity.TableMapping;
 import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.TableMappingRepository;
 
+import static ru.anvera.utils.ConnectorUtils.extractDbNameFromUrl;
+import static ru.anvera.utils.ConnectorUtils.generateTopicName;
+
 /**
  * Генерирует файл с пропертями для таблицы ПОЛУЧАТЕЛЯ (то, куда записываем данные из Kafka).
  */
@@ -23,28 +26,27 @@ public class SinkConnectorConfigGenerator {
   private final SecurityContextUtils           securityContextUtils;
 
   public JsonObject generateSinkConnectorConfig(Long tableMappingId) {
-    // todo добавь получение токена из контекста чтобы везде не пробрасывать
     Long projectId = securityContextUtils.getPrincipal().getProjectId();
 
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
     String       tableName    = tableMapping.getSinkTable();
     String       schemaName   = tableMapping.getSinkSchemaName();
 
-    DatasourceConnection connection = datasourceConnectionRepository.getById(
+    DatasourceConnection sinkDb = datasourceConnectionRepository.getById(
         tableMapping.getSinkDbConnectionId(),
         projectId
     );
 
-    DatasourceConnection sourceConnection = datasourceConnectionRepository.getById(
+    DatasourceConnection sourceDb = datasourceConnectionRepository.getById(
         tableMapping.getSourceDbConnectionId(),
         projectId
     );
 
-    String dbType    = connection.getDbType();
-    String url       = connection.getUrl();
-    String username  = connection.getUsername();
-    String password  = connection.getPassword();
-    String topicName = generateTopicName(extractDbNameFromUrl(sourceConnection.getUrl()), schemaName, tableName);
+    String dbType    = sinkDb.getDbType();
+    String url       = sinkDb.getUrl();
+    String username  = sinkDb.getUsername();
+    String password  = sinkDb.getPassword();
+    String topicName = generateTopicName(extractDbNameFromUrl(sourceDb.getUrl()), schemaName, tableName);
 
     return generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
   }
@@ -76,14 +78,6 @@ public class SinkConnectorConfigGenerator {
     config.add("config", configDetails);
 
     return config;
-  }
-
-  private static String generateTopicName(String dbName, String schemaName, String tableName) {
-    return dbName + "." + schemaName + "." + tableName;
-  }
-
-  private static String extractDbNameFromUrl(String url) {
-    return url.substring(url.lastIndexOf("/") + 1);
   }
 
 }
