@@ -85,6 +85,9 @@ public class DatasourceMetadataService {
   private boolean skipInternalSchema(String schemaName) {
     return schemaName.equals("information_schema")
         || schemaName.equals("pg_toast")
+        || schemaName.equals("INFORMATION_SCHEMA")
+        || schemaName.equals("default")
+        || schemaName.equals("system")
         || schemaName.equals("pg_catalog");
   }
 }
