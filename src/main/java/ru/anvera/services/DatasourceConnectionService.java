@@ -9,6 +9,7 @@ import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
 import ru.anvera.models.enums.DataSourceType;
+import ru.anvera.models.enums.DbType;
 import ru.anvera.models.request.DatasourceConnectionAddRequest;
 import ru.anvera.models.request.DatasourceConnectionRegisterSchemaMappingRequest;
 import ru.anvera.models.request.ValidateConnectionAndGetInfoRequest;
@@ -38,6 +39,9 @@ public class DatasourceConnectionService {
 
   public DatasourceConnection add(DatasourceConnectionAddRequest request,
                                   CustomUserPrincipal principal) {
+    // validate
+    log.info("GCYLUITD :: /add new: " + DbType.valueOf(request.getDbType().toUpperCase()));
+
     // check connection creds
     datasourceMetadataService.validateConnectionAndGetInfo(
         new ValidateConnectionAndGetInfoRequest(

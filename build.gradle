@@ -24,12 +24,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.3.3'
 
+    // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.keycloak:keycloak-spring-boot-starter:22.0.5' // Latest version
+    implementation 'org.keycloak:keycloak-spring-boot-starter:22.0.5'
 
     // PostgreSQL JDBC driver
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'
+
+    // clickhouse
+    implementation 'com.clickhouse:clickhouse-jdbc:0.8.2'
 
     // Jackson for JSON processing
     implementation 'com.fasterxml.jackson.core:jackson-databind'

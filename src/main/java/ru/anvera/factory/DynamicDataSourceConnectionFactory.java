@@ -17,7 +17,7 @@ public class DynamicDataSourceConnectionFactory {
     DbType dbType;
 
     try {
-      dbType = DbType.valueOf(dbTypeString.trim().toLowerCase());
+      dbType = DbType.valueOf(dbTypeString.trim().toUpperCase());
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("data source type is not supported: " + dbTypeString);
     }
