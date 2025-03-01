@@ -92,15 +92,17 @@ public class DatasourceConnectionService {
         principal.getProjectId()
     );
 
-    // ****** sink metadata ******
-    validateSchemaMetadataForExistence(
-        request.getSinkDbConnectionId(),
-        request.getSinkSchemaName(),
-        request.getSinkTableName(),
-        request.getSinkColumnsList(),
-        DataSourceType.SINK,
-        principal.getProjectId()
-    );
+    if (!request.getCreateNew()) {
+      // ****** sink metadata ******
+      validateSchemaMetadataForExistence(
+          request.getSinkDbConnectionId(),
+          request.getSinkSchemaName(),
+          request.getSinkTableName(),
+          request.getSinkColumnsList(),
+          DataSourceType.SINK,
+          principal.getProjectId()
+      );
+    }
 
     if (request.getSinkColumnsList().size() != request.getSourceColumnsList().size()) {
       throw new RuntimeException("Кол-во столбцов для маппинга source: " + request.getSourceColumnsList() + " и sink " + request.getSinkColumnsList() + " таблицы должны быть равны");

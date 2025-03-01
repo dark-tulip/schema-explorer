@@ -3,7 +3,7 @@ package ru.anvera.models.enums;
 import lombok.Getter;
 
 public enum DbType {
-  POSTGRES("postgresql", "org.postgresql.Driver"),
+  POSTGRESQL("postgresql", "org.postgresql.Driver"),
   CLICKHOUSE("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver");
 
   final String name;

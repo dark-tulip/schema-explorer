@@ -18,9 +18,9 @@ public class ConnectorRegistrationService {
   private final PostgresRegistrationService   postgresRegistrationService;
 
   public void registerConnector(Long tableMappingId, DataSourceType dataSourceType, String dbTypeString) {
-    DbType dbType = DbType.valueOf(dbTypeString);
+    DbType dbType = DbType.valueOf(dbTypeString.toUpperCase());
 
-    if (DbType.POSTGRES.equals(dbType)) {
+    if (DbType.POSTGRESQL.equals(dbType)) {
       postgresRegistrationService.register(tableMappingId, dataSourceType);
     }
 

@@ -75,10 +75,14 @@ public class ClickHouseRegistrationService implements RegistrationService {
         ) ENGINE = Kafka
         SETTINGS kafka_broker_list = '%s',
                  kafka_topic_list = '%s',
-                 kafka_group_name = 'clickhouse-consumer',
+                 kafka_group_name = '%s',
                  kafka_format = 'JSONAsString',
                  kafka_max_block_size = 65536;
-        """.formatted(rawKafkaSinkTableName, KAFKA_BROKER_NAME_LIST, readFromTopic);
+        """.formatted(rawKafkaSinkTableName,
+        KAFKA_BROKER_NAME_LIST,
+        readFromTopic,
+        "clickhouse-consumer-" + tableMapping.getSinkTable()
+    );
 
     /*
      * -- Шаг 2: Создать таблицу хранения (persistent)
@@ -105,7 +109,8 @@ public class ClickHouseRegistrationService implements RegistrationService {
     for (Map.Entry<String, String> entry : tableMapping.getSourceToSinkColumnNameMapping().entrySet()) {
       String sourceCol      = entry.getKey();
       String sinkCol        = entry.getValue();
-      String transformation = tableMapping.getTransformations().get(sourceCol);
+      String transformation = tableMapping.getTransformations() == null ? null : tableMapping.getTransformations().get(sourceCol);
+
       createMaterializedViewQuery.append(transformation != null
                                      ? transformation + " AS " + sinkCol
                                      : "JSONExtractString(raw_message, 'payload', '" + sourceCol + "') AS " + sinkCol)
@@ -119,6 +124,4 @@ public class ClickHouseRegistrationService implements RegistrationService {
     sinkJdbcTemplate.execute(createStorageKafkaTable.toString());
     sinkJdbcTemplate.execute(createMaterializedViewQuery.toString());
   }
-
-
 }

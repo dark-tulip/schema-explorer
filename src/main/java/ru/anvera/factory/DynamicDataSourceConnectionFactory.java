@@ -23,7 +23,7 @@ public class DynamicDataSourceConnectionFactory {
     }
 
     switch (dbType) {
-      case POSTGRES:
+      case POSTGRESQL:
         dataSource.setDriverClassName(dbType.getDriverClassName());
         dataSource.addDataSourceProperty("currentSchema", "public");
         break;
