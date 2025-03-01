@@ -1,5 +1,6 @@
+# Добавление sink коннектора в Кликхаус, из топика кафки
 
-1. Добавить соединение с кликхаусом
+## 1. Добавить соединение с кликхаусом
 
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/add' \
@@ -18,12 +19,12 @@ curl --location 'http://localhost:8081/datasource/connection/add' \
 <img width="942" alt="Pasted Graphic 2" src="https://github.com/user-attachments/assets/a57fbb6e-47eb-4c7d-be9f-6e0b628c9f0d" />
 
 
-2. Запись появилась в БД и к ней можно подсоединиться
+## 2. Запись появилась в БД и к ней можно подсоединиться
 
 ￼<img width="1440" alt="Pasted Graphic" src="https://github.com/user-attachments/assets/3a2392fa-a98d-4ba8-9eb4-280d33d408d6" />
 
 
-3. Проверить информации о соединении можно со след АПИ
+## 3. Проверить информации о соединении можно со след АПИ
 
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/metadata/info?datasourceConnectionId=4' \
@@ -34,7 +35,7 @@ curl --location 'http://localhost:8081/datasource/connection/metadata/info?datas
 <img width="940" alt="Pasted Graphic 4" src="https://github.com/user-attachments/assets/6a2012d0-9fde-4fd2-921b-e1f0f4a087f2" />
 
 
-4. Создать маппинг (сопоставление полей)
+## 4. Создать маппинг (сопоставление полей)
 
 ```bash
 curl --location 'http://localhost:8081/datasource/connection/register/table-mapping' \
@@ -59,8 +60,7 @@ curl --location 'http://localhost:8081/datasource/connection/register/table-mapp
 ￼<img width="945" alt="Pasted Graphic 3" src="https://github.com/user-attachments/assets/7ab58b6d-819b-4641-8e44-be6844f1c0dc" />
 
 
-5. Информация о зарегистрированных сопоставлениях
-
+## 5. Информация о зарегистрированных сопоставлениях
 
 ```bash
 curl --location 'http://localhost:8081/table-mapping/info?tableMappingId=4' \
@@ -70,9 +70,7 @@ curl --location 'http://localhost:8081/table-mapping/info?tableMappingId=4' \
 
 ￼<img width="937" alt="Pasted Graphic 5" src="https://github.com/user-attachments/assets/4cda48ad-5107-4e49-aeb2-759458811a38" />
 
-
-6. Регистрация sink connector-a из Топика Кафки в Таблицу Кликхауса
-
+## 6. Регистрация sink connector-a из Топика Кафки в Таблицу Кликхауса
 
 ```bash
 curl --location --request POST 'http://localhost:8081/connectors/register/sink?tableMappingId=4&dbTypeString=clickhouse' \
@@ -82,10 +80,7 @@ curl --location --request POST 'http://localhost:8081/connectors/register/sink?t
 
 ￼<img width="941" alt="Pasted Graphic 6" src="https://github.com/user-attachments/assets/57f80c7a-e4da-4596-8100-384430886bf2" />
 
-
-
 - АПИ Создает таблицы, матвьюху и временную таблицу в кликхаусе если не существует
-
 
 <img width="753" alt="Pasted Graphic 8" src="https://github.com/user-attachments/assets/43abb3cb-e64a-42a2-a8f3-cc88c92d48a3" />
 
@@ -100,6 +95,5 @@ curl --location --request POST 'http://localhost:8081/connectors/register/sink?t
 ￼
 
 Примечание:
-
 - В кликхаусе своя стратегия регистрации коннектора
 - Это не регистрация коннектора, а регистрация контрмера (встроенного по типу ENGINE = Kafka) - используем встроенное решение
