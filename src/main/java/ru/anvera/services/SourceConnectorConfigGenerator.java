@@ -10,9 +10,10 @@ import ru.anvera.models.enums.ConnectorDrivers;
 import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.TableMappingRepository;
 
-import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ru.anvera.utils.ConnectorUtils.*;
 
 /**
  * Генерирует файл с пропертями для таблицы ИСТОЧНИКА (то откуда берем данные и кладем в кафка топик)
@@ -89,22 +90,5 @@ public class SourceConnectorConfigGenerator {
     config.add("config", configDetails);
 
     return config;
-  }
-
-  private static String extractDbNameFromUrl(String url) {
-    return url.substring(url.lastIndexOf("/") + 1);
-  }
-
-  private static String extractHostname(String url) {
-    return url.split("//")[1].split(":")[0];
-  }
-
-  private static String extractPort(String url) {
-    try {
-      URI uri = new URI(url.substring(5)); // Удаляем "jdbc:" для корректной обработки
-      return String.valueOf(uri.getPort());
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Invalid URL format: " + url, e);
-    }
   }
 }
