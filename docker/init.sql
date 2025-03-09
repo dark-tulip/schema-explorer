@@ -23,15 +23,16 @@ CREATE TABLE books
     id             BIGSERIAL PRIMARY KEY,
     title          text NOT NULL,
     author         text NOT NULL,
-    published_year INTEGER
+    published_year INTEGER,
+    quantity       INTEGER
 );
 
-INSERT INTO books (title, author, published_year)
-VALUES ('1984', 'George Orwell', 1949),
-       ('To Kill a Mockingbird', 'Harper Lee', 1960),
-       ('The Great Gatsby', 'F. Scott Fitzgerald', 1925),
-       ('Pride and Prejudice', 'Jane Austen', 1813),
-       ('The Catcher in the Rye', 'J.D. Salinger', 1951);
+INSERT INTO books (title, author, published_year, quantity)
+VALUES ('1984', 'George Orwell', 1949, 100),
+       ('To Kill a Mockingbird', 'Harper Lee', 1960, 100),
+       ('The Great Gatsby', 'F. Scott Fitzgerald', 1925, 100),
+       ('Pride and Prejudice', 'Jane Austen', 1813, 100),
+       ('The Catcher in the Rye', 'J.D. Salinger', 1951, 100);
 
 -- Установить wal_level на уровне базы данных
 ALTER SYSTEM SET wal_level = 'logical';
@@ -50,6 +51,7 @@ CREATE TABLE books
     id             BIGSERIAL PRIMARY KEY,
     title          text NOT NULL,
     author         text NOT NULL,
-    published_year INTEGER
+    published_year INTEGER,
+    quantity       INTEGER
 );
 -- ======================================================================================
