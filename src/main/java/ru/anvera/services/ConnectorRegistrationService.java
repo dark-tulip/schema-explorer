@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.anvera.models.enums.DataSourceType;
 import ru.anvera.models.enums.DbType;
 import ru.anvera.services.connectors.ClickHouseRegistrationService;
+import ru.anvera.services.connectors.MongodbRegistrationService;
 import ru.anvera.services.connectors.PostgresRegistrationService;
 
 
@@ -16,6 +17,7 @@ public class ConnectorRegistrationService {
 
   private final ClickHouseRegistrationService clickHouseRegistrationService;
   private final PostgresRegistrationService   postgresRegistrationService;
+  private final MongodbRegistrationService    mongodbRegistrationService;
 
   public void registerConnector(Long tableMappingId, DataSourceType dataSourceType, String dbTypeString) {
     DbType dbType = DbType.valueOf(dbTypeString.toUpperCase());
@@ -26,6 +28,10 @@ public class ConnectorRegistrationService {
 
     if (DbType.CLICKHOUSE.equals(dbType)) {
       clickHouseRegistrationService.register(tableMappingId, dataSourceType);
+    }
+
+    if (DbType.MONGODB.equals(dbType)) {
+      mongodbRegistrationService.register(tableMappingId, dataSourceType);
     }
 
   }

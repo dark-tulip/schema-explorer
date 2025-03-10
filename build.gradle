@@ -34,6 +34,9 @@ dependencies {
 
     // clickhouse
     implementation 'com.clickhouse:clickhouse-jdbc:0.8.2'
+    implementation 'org.mongodb:mongodb-driver-sync:4.9.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
 
     // Jackson for JSON processing
     implementation 'com.fasterxml.jackson.core:jackson-databind'

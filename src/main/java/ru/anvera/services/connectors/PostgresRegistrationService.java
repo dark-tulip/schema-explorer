@@ -4,9 +4,9 @@ package ru.anvera.services.connectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.anvera.models.enums.DataSourceType;
-import ru.anvera.services.SinkConnectorConfigGenerator;
-import ru.anvera.services.SourceConnectorConfigGenerator;
 import ru.anvera.services.callers.KafkaHttpClientCaller;
+import ru.anvera.services.connectors.generators.PostgresSinkConnectorConfigGenerator;
+import ru.anvera.services.connectors.generators.PostgresSourceConnectorConfigGenerator;
 
 import java.io.IOException;
 
@@ -15,16 +15,16 @@ import java.io.IOException;
 @Service
 public class PostgresRegistrationService implements RegistrationService {
 
-  private final SourceConnectorConfigGenerator sourceConnectorConfigGenerator;
-  private final SinkConnectorConfigGenerator   sinkConnectorConfigGenerator;
-  private final KafkaHttpClientCaller          kafkaHttpClientCaller;
+  private final PostgresSourceConnectorConfigGenerator postgresSourceConnectorConfigGenerator;
+  private final PostgresSinkConnectorConfigGenerator   postgresSinkConnectorConfigGenerator;
+  private final KafkaHttpClientCaller                  kafkaHttpClientCaller;
 
   public void register(Long tableMappingId, DataSourceType connectorType) {
     String jsonPayload;
     if (connectorType.equals(DataSourceType.SINK)) {
-      jsonPayload = sinkConnectorConfigGenerator.generateSinkConnectorConfig(tableMappingId).toString();
+      jsonPayload = postgresSinkConnectorConfigGenerator.generateSinkConnectorConfig(tableMappingId).toString();
     } else {
-      jsonPayload = sourceConnectorConfigGenerator.generateSourceConnectorConfig(tableMappingId).toString();
+      jsonPayload = postgresSourceConnectorConfigGenerator.generateSourceConnectorConfig(tableMappingId).toString();
     }
 
     try {

@@ -4,7 +4,8 @@ import lombok.Getter;
 
 public enum DbType {
   POSTGRESQL("postgresql", "org.postgresql.Driver"),
-  CLICKHOUSE("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver");
+  CLICKHOUSE("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver"),
+  MONGODB("mongodb", "");
 
   final String name;
 

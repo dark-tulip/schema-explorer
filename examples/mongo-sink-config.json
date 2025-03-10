@@ -1,0 +1,18 @@
+{
+  "name": "mongo-sink",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSinkConnector",
+    "tasks.max": "1",
+    "topics": "source_db.public.books",
+    "connection.uri": "mongodb://root:example@mongodb:27017/",
+    "database": "public",
+    "collection": "books",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+
+    "document.id.strategy": "com.mongodb.kafka.connect.sink.processor.id.strategy.PartialValueStrategy",
+    "document.id.strategy.partial.value.projection.list": "id",
+    "document.id.strategy.partial.value.projection.type": "AllowList"
+  }
+}

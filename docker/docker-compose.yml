@@ -104,10 +104,12 @@ services:
       CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
-      CONNECT_PLUGIN_PATH: "/kafka/connect,/debezium-connector-postgres,/debezium-connector-mongodb"
+      CONNECT_PLUGIN_PATH: "/kafka/connect,/usr/share/java"
     depends_on:
       - kafka-1
       - postgres
+    volumes:
+      - ./kafka-connectors:/usr/share/java
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
@@ -131,28 +133,41 @@ services:
     depends_on:
       - postgres
 
-  clickhouse:
-    image: clickhouse/clickhouse-server:23.8
-    container_name: clickhouse
+#  clickhouse:
+#    image: clickhouse/clickhouse-server:23.8
+#    container_name: clickhouse
+#    restart: always
+#    ports:
+#      - "8123:8123"  # HTTP-интерфейс
+#      - "9000:9000"  # TCP-интерфейс
+#    environment:
+#      CLICKHOUSE_DB: testdb
+#      CLICKHOUSE_USER: clickuser
+#      CLICKHOUSE_PASSWORD: clickpass
+#    volumes:
+#      - clickhouse_data:/var/lib/clickhouse
+#    ulimits:
+#      nofile:
+#        soft: 262144
+#        hard: 262144
+#    depends_on:
+#      - kafka-1
+
+  # MongoDB Service
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
     restart: always
     ports:
-      - "8123:8123"  # HTTP-интерфейс
-      - "9000:9000"  # TCP-интерфейс
+      - "27017:27017"
     environment:
-      CLICKHOUSE_DB: testdb
-      CLICKHOUSE_USER: clickuser
-      CLICKHOUSE_PASSWORD: clickpass
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-      - clickhouse_data:/var/lib/clickhouse
-#      - ./clickhouse-config.xml:/etc/clickhouse-server/config.xml
-#      - ./clickhouse-users.xml:/etc/clickhouse-server/users.xml
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-    depends_on:
-      - kafka-1
+      - mongodb_data:/data/db
 
 volumes:
   postgres_data:
   clickhouse_data:
+  mongodb_data:
+

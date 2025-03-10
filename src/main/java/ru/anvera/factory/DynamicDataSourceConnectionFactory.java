@@ -32,6 +32,9 @@ public class DynamicDataSourceConnectionFactory {
         dataSource.setDriverClassName(dbType.getDriverClassName());
         break;
 
+      case MONGODB:
+        break;
+
       default:
         throw new IllegalArgumentException("Unsupported database type: " + dbType);
     }
