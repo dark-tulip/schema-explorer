@@ -10,8 +10,7 @@ import ru.anvera.models.entity.TableMapping;
 import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.TableMappingRepository;
 
-import static ru.anvera.utils.ConnectorUtils.extractDbNameFromUrl;
-import static ru.anvera.utils.ConnectorUtils.generateTopicName;
+import static ru.anvera.utils.ConnectorUtils.*;
 
 /**
  * Generates a Kafka Connect configuration file for MongoDB Sink Connector.
@@ -24,6 +23,8 @@ public class MongoSinkConnectorConfigGenerator {
   private final DatasourceConnectionRepository datasourceConnectionRepository;
   private final TableMappingRepository         tableMappingRepository;
   private final SecurityContextUtils           securityContextUtils;
+
+  private final static String DOCKER_COMPOSE_DATABASE_CONTAINER_NAME="mongodb";
 
   /**
    * Generates a MongoDB Sink Connector configuration in JSON format.
@@ -70,6 +71,8 @@ public class MongoSinkConnectorConfigGenerator {
     configDetails.addProperty("connector.class", "com.mongodb.kafka.connect.MongoSinkConnector");
     configDetails.addProperty("tasks.max", "1");
     configDetails.addProperty("topics", topicName);
+    // todo adaptation for docker compose
+    configDetails.addProperty("database.hostname", extractHostname(url).replaceAll("localhost", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME));
     configDetails.addProperty("connection.uri", url);
     configDetails.addProperty("database", "public");
     configDetails.addProperty("collection", tableName);

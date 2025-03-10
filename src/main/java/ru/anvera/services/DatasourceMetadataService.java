@@ -36,8 +36,7 @@ public class DatasourceMetadataService {
       try (MongoClient mongoClient = dynamicMongoClientFactory.createMongoClient(
               request.getUrl(),
               request.getUsername(),
-              request.getPassword())
-      ) {
+              request.getPassword())) {
 
         // Create new repo instance with the client
         MongoDatabaseMetadataRepository mongoDatabaseMetadataRepository = new MongoDatabaseMetadataRepository(mongoClient);
@@ -59,15 +58,12 @@ public class DatasourceMetadataService {
                     column.get("is_nullable") != null ? column.get("is_nullable").toString() : "unknown"
                 ))
                 .collect(Collectors.toList());
-
             collections.put(collectionName, columnsResponse);
           }
-
           databaseAndCollections.put(databaseName, collections);
         }
 
         log.info("MongoDB connection validated for datasource: {}", new DatasourceMetadataInfoResponse(databaseAndCollections));
-
         return new DatasourceMetadataInfoResponse(databaseAndCollections);
       }
     }
@@ -83,15 +79,12 @@ public class DatasourceMetadataService {
 
     // create new repo for this data source
     PostgresDatabaseMetadataRepository postgresDatabaseMetadataRepository = new PostgresDatabaseMetadataRepository(jdbcTemplate);
-
     HashMap<String, HashMap<String, List<ColumnMetadataResponse>>> schemaNameAndTables = new HashMap<>();
 
     for (String schemaName : postgresDatabaseMetadataRepository.getSchemas()) {
-
       if (skipInternalSchema(schemaName)) {
         continue;
       }
-
       HashMap<String, List<ColumnMetadataResponse>> tables = new HashMap<>();
 
       for (String tableName : postgresDatabaseMetadataRepository.getTableNames(schemaName)) {
@@ -104,13 +97,10 @@ public class DatasourceMetadataService {
                 (String) column.get("is_nullable")
             ))
             .collect(Collectors.toList());
-
         tables.put(tableName, columnsResponse);
       }
-
       schemaNameAndTables.put(schemaName, tables);
     }
-
     log.info("63GAN469 :: connection validated for datasource: {}", new DatasourceMetadataInfoResponse(schemaNameAndTables));
 
     return new DatasourceMetadataInfoResponse(schemaNameAndTables);
