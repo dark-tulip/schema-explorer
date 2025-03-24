@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.anvera.models.enums.DataSourceType;
 import ru.anvera.services.callers.KafkaHttpClientCaller;
 import ru.anvera.services.connectors.generators.MongoSinkConnectorConfigGenerator;
+import ru.anvera.services.connectors.generators.MongoSourceConnectorConfigGenerator;
 
 import java.io.IOException;
 
@@ -16,8 +17,8 @@ import java.io.IOException;
 public class MongodbRegistrationService implements RegistrationService {
 
   private final KafkaHttpClientCaller             kafkaHttpClientCaller;
-  private final MongoSinkConnectorConfigGenerator mongoSinkConnectorConfigGenerator;
-
+  private final MongoSinkConnectorConfigGenerator   mongoSinkConnectorConfigGenerator;
+  private final MongoSourceConnectorConfigGenerator mongoSourceConnectorConfigGenerator;
 
   @Override
   @Transactional
@@ -26,7 +27,7 @@ public class MongodbRegistrationService implements RegistrationService {
     if (dataSourceType.equals(DataSourceType.SINK)) {
       jsonPayload = mongoSinkConnectorConfigGenerator.generateMongoSinkConnectorConfig(tableMappingId).toString();
     } else {
-      throw new RuntimeException("mongo source connector not implemented yet");
+      jsonPayload = mongoSourceConnectorConfigGenerator.generateMongoSourceConnectorConfig(tableMappingId).toString();
     }
 
     try {

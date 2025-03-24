@@ -1,0 +1,22 @@
+{
+  "name": "mongo-source",
+  "config": {
+    "connector.class": "com.mongodb.kafka.connect.MongoSourceConnector",
+    "tasks.max": "1",
+    "connection.uri": "mongodb://root:example@mongodb:27017/",
+    "database": "public",
+    "collection": "books",
+    "topic.prefix": "mongo.public.books",
+
+    "output.format.value": "json",
+    "output.format.key": "json",
+
+    "poll.max.batch.size": "1000",
+    "poll.await.time.ms": "5000",
+    "copy.existing": "true",
+    "copy.existing.pipeline": "[{ \"$match\": {}}]",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter"
+  }
+}

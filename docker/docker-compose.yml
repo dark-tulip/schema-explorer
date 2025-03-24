@@ -163,8 +163,26 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    command: ["mongod", "--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
     volumes:
       - mongodb_data:/data/db
+      - ./mongo-keyfile:/etc/mongo-keyfile:ro
+
+  mongo-init-replica:
+    image: mongo:6
+    depends_on:
+      - mongodb
+    restart: "no"
+    entrypoint: >
+      bash -c "
+        sleep 5;
+        mongosh --host mongodb:27017 -u root -p example --authenticationDatabase admin --eval '
+          rs.initiate({
+            _id: \"rs0\",
+            members: [{ _id: 0, host: \"mongodb:27017\" }]
+          })
+        '
+      "
 
 volumes:
   postgres_data:
