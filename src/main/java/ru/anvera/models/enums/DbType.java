@@ -12,6 +12,10 @@ public enum DbType {
   @Getter
   final String driverClassName;
 
+  public static DbType valueOfToUpperCase(String value) {
+    return DbType.valueOf(value.toUpperCase());
+  }
+
   DbType(String name, String driverClassName) {
     this.name            = name;
     this.driverClassName = driverClassName;
