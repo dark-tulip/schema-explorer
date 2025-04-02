@@ -32,3 +32,66 @@ curl --location --request POST 'http://localhost:8081/connectors/register/sink?t
 3. Успешно зарегистрированный коннектор подхватит данные c source_db
 
 ![img_5.png](img_5.png)
+
+
+## Create source connector example
+
+```bash
+curl --location 'http://localhost:8081/datasource/connection/add' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: ••••••' \
+--header 'Cookie: JSESSIONID=691F306B05045D512994A594D06B82D9' \
+--data-raw '{
+    "dbType": "mongodb",
+    "url": "mongodb://root:example@localhost:27017",
+    "username": "root",
+    "password": "example",
+    "isActive": "true"
+}'
+```
+
+![img_6.png](img_6.png)
+
+
+## Зарегистрировать маппинг из монги в постгрес
+
+1. Создать БД и коллекцию в монге
+```bash
+show dbs;
+use public;
+db.books.insertOne({"name":"tutorials point"})
+```
+
+2. `name (in mongo) -> title (in postgres)`
+```bash
+curl --location 'http://localhost:8081/datasource/connection/register/table-mapping' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: ••••••' \
+--header 'Cookie: JSESSIONID=97123A0F80A535EDDD8BD5C9882602FA' \
+--data '{
+  "sourceDbConnectionId": 6,
+  "sinkDbConnectionId": 2,
+  "sourceSchemaName": "public",
+  "sinkSchemaName": "public",
+  "sourceTableName": "books",
+  "sinkTableName": "books",
+  "sourceColumnsList": ["_id", "name"],
+  "sinkColumnsList": ["id", "title"],
+  "transformations": null
+}
+'
+```
+
+![img_7.png](img_7.png)
+
+3. Зарегистрировать source коннектор
+
+```bash
+curl --location --request POST 'http://localhost:8081/connectors/register/source?tableMappingId=2&dbTypeString=MONGODB' \
+--header 'Authorization: Bearer ..' \
+--header 'Cookie: JSESSIONID=17AF08FDDA235381E13A483BDA933754'
+```
+
+![img_8.png](img_8.png)
+
+

@@ -33,7 +33,7 @@ public class MongodbRegistrationService implements RegistrationService {
     try {
       kafkaHttpClientCaller.callRegisterNewConnector(jsonPayload);
     } catch (IOException e) {
-      throw new IllegalArgumentException("cannot register connector for postgres: " + e.getMessage());
+      throw new IllegalArgumentException("cannot register connector for mongo: " + e.getMessage());
     }
   }
 }

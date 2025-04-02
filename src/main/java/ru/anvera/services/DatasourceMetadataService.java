@@ -31,7 +31,7 @@ public class DatasourceMetadataService {
   private final DatasourceConnectionRepository datasourceConnectionRepository;
 
   public DatasourceMetadataInfoResponse validateConnectionAndGetInfo(ValidateConnectionAndGetInfoRequest request) {
-    if (request.getDbType().equals(DbType.MONGODB.name())) {
+    if (request.getDbType().equals(DbType.MONGODB.getName())) {
       // Create a new MongoClient dynamically
       try (MongoClient mongoClient = dynamicMongoClientFactory.createMongoClient(
               request.getUrl(),

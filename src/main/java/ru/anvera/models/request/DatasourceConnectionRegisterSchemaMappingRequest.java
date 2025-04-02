@@ -37,6 +37,8 @@ public class DatasourceConnectionRegisterSchemaMappingRequest {
 
   // Преобразования, применяемые к данным. При перемещении из source в sink
   private HashMap<String, String> transformations;
+
+  @NotNull(message = "you should set createNew in your request body")
   private Boolean createNew;
 
 }

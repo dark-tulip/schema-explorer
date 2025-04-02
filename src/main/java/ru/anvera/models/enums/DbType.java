@@ -7,6 +7,7 @@ public enum DbType {
   CLICKHOUSE("clickhouse", "com.clickhouse.jdbc.ClickHouseDriver"),
   MONGODB("mongodb", "");
 
+  @Getter
   final String name;
 
   @Getter

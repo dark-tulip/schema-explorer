@@ -46,7 +46,7 @@ public class MongoSourceConnectorConfigGenerator {
 
     String dbType = sourceDb.getDbType();
     String url = sourceDb.getUrl();
-    String topicName = generateTopicName(extractDbNameFromUrl(sourceDb.getUrl()), schemaName, tableName);
+    String topicName = schemaName + "." + tableName;
 
     return generateSourceConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, schemaName, tableName, topicName);
   }

@@ -166,7 +166,8 @@ services:
     command: ["mongod", "--replSet", "rs0", "--keyFile", "/etc/mongo-keyfile"]
     volumes:
       - mongodb_data:/data/db
-      - ./mongo-keyfile:/etc/mongo-keyfile:ro
+      - ./mongo-keyfile:/etc/mongo-keyfile
+      - ./mongod.conf:/etc/mongod.conf
 
   mongo-init-replica:
     image: mongo:6
