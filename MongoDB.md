@@ -95,3 +95,44 @@ curl --location --request POST 'http://localhost:8081/connectors/register/source
 ![img_8.png](img_8.png)
 
 
+
+i need to read this messange from kafka topic
+
+```json
+
+{
+    "_id": {
+    "_data": "8267EDC074000000012B022C0100296E5A1004815DCEF7E84445B2A614676468176D9946645F6964006467EDC074B4A7A220EAA674380004"
+    },
+    "operationType": "insert",
+    "clusterTime": {
+    "$timestamp": {
+    "t": 1743634548,
+    "i": 1
+    }
+    },
+    "wallTime": {
+    "$date": 1743634548239
+    },
+    "fullDocument": {
+    "_id": {
+    "$oid": "67edc074b4a7a220eaa67438"
+    },
+    "name": "tutorials point3"
+    },
+    "ns": {
+    "db": "public",
+    "coll": "books"
+    },
+    "documentKey": {
+    "_id": {
+    "$oid": "67edc074b4a7a220eaa67438"
+    }
+    }
+}
+```
+
+with sink connector to postgres
+
+_id should be transformed to id
+and name -> title in postgres

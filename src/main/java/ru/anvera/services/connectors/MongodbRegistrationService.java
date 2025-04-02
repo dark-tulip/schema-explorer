@@ -33,7 +33,11 @@ public class MongodbRegistrationService implements RegistrationService {
     try {
       kafkaHttpClientCaller.callRegisterNewConnector(jsonPayload);
     } catch (IOException e) {
-      throw new IllegalArgumentException("cannot register connector for mongo: " + e.getMessage());
+      if ( e.getMessage().contains("409 for URL")) {
+        throw new IllegalArgumentException("Connector already exists. Use another API to update config file");
+      } else {
+        throw new IllegalArgumentException("cannot register connector for mongo: " + e.getMessage());
+      }
     }
   }
 }
