@@ -4,6 +4,8 @@ package ru.anvera.services.callers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,6 +19,7 @@ import static ru.anvera.configs.KafkaBrocerConfigs.KAFKA_CONNECT_URL;
 @Service
 @RequiredArgsConstructor
 public class KafkaHttpClientCaller {
+  private final RestTemplate restTemplate = new RestTemplate();
 
   public void callRegisterNewConnector(String jsonPayload) throws IOException {
     URL url = new URL(KAFKA_CONNECT_URL);
@@ -41,6 +44,21 @@ public class KafkaHttpClientCaller {
       }
       log.info("V62NH6IY :: response of connector registration: " + response);
       connection.disconnect();
+    }
+  }
+
+  public void delete(String connectorName) throws InterruptedException {
+    log.info("Deleting existing connector: {}", connectorName);
+    restTemplate.delete(KAFKA_CONNECT_URL + "/" + connectorName);
+    Thread.sleep(2000); // brief wait for cleanup
+  }
+
+  public boolean connectorExists(String name) {
+    try {
+      restTemplate.getForEntity(KAFKA_CONNECT_URL + "/" + name, String.class);
+      return true;
+    } catch (HttpClientErrorException.NotFound e) {
+      return false;
     }
   }
 }
