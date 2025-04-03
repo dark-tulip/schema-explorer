@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.anvera.configs.SecurityContextUtils;
 import ru.anvera.models.entity.DatasourceConnection;
 import ru.anvera.models.entity.TableMapping;
+import ru.anvera.models.enums.DbType;
 import ru.anvera.repos.DatasourceConnectionRepository;
 import ru.anvera.repos.TableMappingRepository;
 
@@ -48,6 +49,10 @@ public class PostgresSinkConnectorConfigGenerator {
     String password  = sinkDb.getPassword();
     String topicName = generateTopicName(extractDbNameFromUrl(sourceDb.getUrl()), schemaName, tableName);
 
+    if (sourceDb.getDbType().equalsIgnoreCase(DbType.MONGODB.getName())) {
+      topicName = sourceDb.getDbType() + "." + schemaName + "." + tableName;
+    }
+
     return generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
   }
 
@@ -58,7 +63,7 @@ public class PostgresSinkConnectorConfigGenerator {
     log.warn("81C5XOYS :: created sink connector to topic: " + topicName);
 
     JsonObject config = new JsonObject();
-    config.addProperty("name", dbType + "sink-connector-" + id);
+    config.addProperty("name", dbType + "-" + topicName + "-sink-connector-" + id);
 
     JsonObject configDetails = new JsonObject();
     configDetails.addProperty("connector.class", "io.debezium.connector.jdbc.JdbcSinkConnector");

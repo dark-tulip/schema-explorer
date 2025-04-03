@@ -32,7 +32,7 @@ public class MongoSourceConnectorConfigGenerator {
    * @param tableMappingId The ID of the table mapping.
    * @return A JSON object representing the connector configuration.
    */
-  public JsonObject generateMongoSourceConnectorConfig(Long tableMappingId) {
+  public JsonObject  generateMongoSourceConnectorConfig(Long tableMappingId) {
     Long projectId = securityContextUtils.getPrincipal().getProjectId();
 
     TableMapping tableMapping = tableMappingRepository.getById(tableMappingId);
@@ -46,7 +46,7 @@ public class MongoSourceConnectorConfigGenerator {
 
     String dbType = sourceDb.getDbType();
     String url = sourceDb.getUrl();
-    String topicName = schemaName + "." + tableName;
+    String topicName = tableName;
 
     return generateSourceConnectorConfig(tableMapping.getSourceDbConnectionId(), dbType, url, schemaName, tableName, topicName);
   }
@@ -68,7 +68,7 @@ public class MongoSourceConnectorConfigGenerator {
     configDetails.addProperty("connection.uri", url.replace("localhost", DOCKER_COMPOSE_DATABASE_CONTAINER_NAME));
     configDetails.addProperty("database", schemaName);
     configDetails.addProperty("collection", collectionName);
-    configDetails.addProperty("topic.prefix", topicName);
+    configDetails.addProperty("topic.prefix", dbType);
 
     // Optional: Include all existing data
     configDetails.addProperty("copy.existing", "true");
@@ -76,7 +76,7 @@ public class MongoSourceConnectorConfigGenerator {
 
     // Kafka Message format
     configDetails.addProperty("key.converter", "org.apache.kafka.connect.storage.StringConverter");
-    configDetails.addProperty("value.converter", "org.apache.kafka.connect.json.JsonConverter");
+    configDetails.addProperty("value.converter", "org.apache.kafka.connect.storage.StringConverter");
 
     // Tuning
     configDetails.addProperty("poll.max.batch.size", "1000");
