@@ -1,0 +1,27 @@
+{
+  "name": "mongo-json-parser",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "topics": "mongo.books",
+    "tasks.max": "1",
+    "connection.url": "jdbc:postgresql://local_postgres:5432/internaldb",
+    "connection.user": "internal_usr",
+    "connection.password": "internalusrpwd",
+
+    "insert.mode": "insert",
+    "auto.create": "true",
+    "auto.evolve": "true",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+
+    "transforms": "extractAfter,parseJson",
+
+    "transforms.extractAfter.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.extractAfter.field": "payload.after",
+
+    "transforms.parseJson.type": "com.github.jcustenborder.kafka.connect.transform.common.FromJson$Value",
+    "transforms.parseJson.schema": "{\"type\":\"struct\",\"fields\":[{\"type\":\"string\",\"field\":\"_id\"}, {\"type\":\"string\",\"field\":\"name\"}]}"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "mongo-source-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mongodb.MongoDbConnector",
+    "mongodb.connection.string": "mongodb://root:example@mongodb:27017/?replicaSet=rs0",
+    "topic.prefix": "mongo",
+    "collection.include.list": "public[.]*"
+  }
+}

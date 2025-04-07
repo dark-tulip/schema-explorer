@@ -51,6 +51,8 @@ public class PostgresSinkConnectorConfigGenerator {
 
     if (sourceDb.getDbType().equalsIgnoreCase(DbType.MONGODB.getName())) {
       topicName = sourceDb.getDbType() + "." + schemaName + "." + tableName;
+
+      return generateConnectorConfigV2FromSourceMongoToSinkPostgres(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
     }
 
     return generateConnectorConfig(tableMapping.getSinkDbConnectionId(), dbType, url, username, password, tableName, topicName);
@@ -84,5 +86,57 @@ public class PostgresSinkConnectorConfigGenerator {
 
     return config;
   }
+
+  private static JsonObject generateConnectorConfigV2FromSourceMongoToSinkPostgres(
+      Long id, String dbType, String url, String username, String password,
+      String tableName, String topicName) {
+
+    JsonObject config = new JsonObject();
+    config.addProperty("name", dbType + "-" + topicName + "-sink-connector-" + id);
+
+    JsonObject configDetails = new JsonObject();
+    configDetails.addProperty("connector.class", "io.debezium.connector.jdbc.JdbcSinkConnector");
+    configDetails.addProperty("tasks.max", "1");
+    configDetails.addProperty("topics", topicName);
+
+    configDetails.addProperty("connection.url", url.replace("localhost", "local_postgres"));
+    configDetails.addProperty("connection.username", username);
+    configDetails.addProperty("connection.password", password);
+
+    configDetails.addProperty("table.name.format", tableName);
+    configDetails.addProperty("auto.create", "true");
+    configDetails.addProperty("auto.evolve", "true");
+
+    // Use upsert mode
+    configDetails.addProperty("insert.mode", "upsert");
+    configDetails.addProperty("pk.mode", "record_key");
+    configDetails.addProperty("pk.fields", "id");
+
+    configDetails.addProperty("key.converter", "org.apache.kafka.connect.json.JsonConverter");
+    configDetails.addProperty("value.converter", "org.apache.kafka.connect.json.JsonConverter");
+    configDetails.addProperty("key.converter.schemas.enable", "false");
+    configDetails.addProperty("value.converter.schemas.enable", "false");
+
+    // Add transformations
+    configDetails.addProperty("transforms", "unwrap,renameFields,extractIdKey");
+
+    // Unwrap fullDocument from MongoDB CDC envelope
+    configDetails.addProperty("transforms.unwrap.type", "io.debezium.transforms.ExtractNewDocumentState");
+    configDetails.addProperty("transforms.unwrap.drop.tombstones", "true");
+    configDetails.addProperty("transforms.unwrap.delete.handling.mode", "drop");
+
+    // Rename fields (_id -> id, name -> title)
+    configDetails.addProperty("transforms.renameFields.type", "org.apache.kafka.connect.transforms.ReplaceField$Value");
+    configDetails.addProperty("transforms.renameFields.renames", "_id:id,name:title");
+
+    // Extract _id from documentKey to key (so it can be used as primary key)
+    configDetails.addProperty("transforms.extractIdKey.type", "org.apache.kafka.connect.transforms.ExtractField$Key");
+    configDetails.addProperty("transforms.extractIdKey.field", "_id");
+
+    config.add("config", configDetails);
+
+    return config;
+  }
+
 
 }
