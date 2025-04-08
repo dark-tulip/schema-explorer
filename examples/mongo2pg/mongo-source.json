@@ -5,8 +5,6 @@
     "mongodb.connection.string": "mongodb://root:example@mongodb:27017/?replicaSet=rs0",
     "topic.prefix": "mongo",
     "collection.include.list": "public.books*",
-
-    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
-    "value.converter.schemas.enable": false
+    "mongodb.source.structurize": "true"
   }
 }

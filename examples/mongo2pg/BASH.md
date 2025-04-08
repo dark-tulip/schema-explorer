@@ -18,7 +18,7 @@ curl -X DELETE http://localhost:8083/connectors/mongo-source-connector
 
 
 ```bash
-curl -X DELETE http://localhost:8083/connectors/pg-sink-books 
+curl -X DELETE http://localhost:8083/connectors/postgres-sink-connector
 ```
 
 
