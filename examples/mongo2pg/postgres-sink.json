@@ -7,17 +7,18 @@
     "connection.url": "jdbc:postgresql://local_postgres:5432/sink_db",
     "connection.user": "user2",
     "connection.password": "user2pwd",
-    "insert.mode": "insert",
+    "insert.mode": "upsert",
     "auto.create": true,
     "auto.evolve": true,
-    "delete.enabled": false,
-    "pk.mode": "none",
+    "delete.enabled": true,
+    "pk.mode": "record_key",
+    "pk.fields": "id",
     "table.name.format": "books",
     "transforms": "unwrap,dropMeta",
     "transforms.unwrap.type": "io.debezium.connector.mongodb.transforms.ExtractNewDocumentState",
     "transforms.unwrap.drop.tombstones": "true",
     "transforms.unwrap.delete.handling.mode": "none",
     "transforms.dropMeta.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
-    "transforms.dropMeta.blacklist": "source,updateDescription,transaction,op,ts_ms"
+    "transforms.dropMeta.blacklist": "source,updateDescription,transaction"
   }
 }
